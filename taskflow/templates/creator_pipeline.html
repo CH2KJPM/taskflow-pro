@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; margin-bottom:1.5rem;">
+    <div>
+      <h1 class="page-title">Pipeline de contenu</h1>
+      <p class="page-subtitle">
+        Board éditorial par étape : de l’idée jusqu’au contenu publié.
+      </p>
+    </div>
+    <div style="display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:flex-end;">
+      <a href="{{ url_for('main.creator_new_content') }}">
+        <button class="btn btn-primary">+ Nouveau contenu</button>
+      </a>
+      <a href="{{ url_for('main.creator_dashboard') }}">
+        <button class="btn btn-secondary">Dashboard créateur</button>
+      </a>
+      <a href="{{ url_for('main.calendar_view', view='week') }}">
+        <button class="btn btn-secondary">Calendrier</button>
+      </a>
+    </div>
+  </div>
+
+  <div class="card-soft">
+    <p class="muted" style="margin-bottom:0.8rem; font-size:0.8rem;">
+      Clique sur les boutons <strong>“À filmer / À monter / Programmé / Publié”</strong>
+      pour faire avancer chaque contenu dans ton pipeline.
+    </p>
+
+    <div class="kanban-columns" style="overflow-x:auto; padding-bottom:0.5rem;">
+      {% for col in columns_meta %}
+        {% set key = col.key %}
+        {% set tasks = columns[key] %}
+
+        <div class="kanban-column" style="min-width:230px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem;">
+            <h3 style="margin:0; font-size:0.85rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted);">
+              {{ col.label }}
+            </h3>
+            <span class="pill" style="font-size:0.7rem; background:rgba(15,23,42,0.9); border-color:rgba(55,65,81,0.9); color:var(--text-muted);">
+              {{ tasks|length }}
+            </span>
+          </div>
+
+          {% if tasks %}
+            {% for t in tasks %}
+              <div class="task-card">
+                <div class="task-title" style="margin-bottom:0.2rem;">
+                  {{ t.title }}
+                </div>
+
+                {% if t.description %}
+                  <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:0.2rem;">
+                    {{ t.description }}
+                  </div>
+                {% endif %}
+
+                <div class="task-meta">
+                  <div style="display:flex; gap:0.25rem; flex-wrap:wrap;">
+                    {% if t.platform == "tiktok" %}
+                      <span class="pill" style="background:rgba(248,113,113,0.12); border-color:rgba(248,113,113,0.7); color:#fecaca;">
+                        TikTok
+                      </span>
+                    {% elif t.platform == "instagram" %}
+                      <span class="pill" style="background:rgba(236,72,153,0.12); border-color:rgba(236,72,153,0.7); color:#f9a8d4;">
+                        Instagram
+                      </span>
+                    {% elif t.platform == "youtube" %}
+                      <span class="pill" style="background:rgba(248,113,113,0.12); border-color:rgba(239,68,68,0.8); color:#fecaca;">
+                        YouTube
+                      </span>
+                    {% elif t.platform == "other" %}
+                      <span class="pill" style="background:rgba(59,130,246,0.12); border-color:rgba(59,130,246,0.7); color:#bfdbfe;">
+                        Multi
+                      </span>
+                    {% endif %}
+
+                    {% if t.priority == 'low' %}
+                      <span class="pill pill-low">Basse</span>
+                    {% elif t.priority == 'high' %}
+                      <span class="pill pill-high">Haute</span>
+                    {% else %}
+                      <span class="pill pill-medium">Moyenne</span>
+                    {% endif %}
+                  </div>
+
+                  <div class="task-date">
+                    {% if t.due_date %}
+                      {{ t.due_date.strftime("%d.%m.%Y") }}
+                    {% endif %}
+                    {% if t.project %}
+                      • {{ t.project.name }}
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="task-actions" style="margin-top:0.45rem; flex-wrap:wrap; gap:0.25rem;">
+                  <!-- Avancement rapide dans le pipeline -->
+                  <form method="post"
+                        action="{{ url_for('main.update_creator_stage', task_id=t.id, new_stage='to_film') }}">
+                    <button class="btn btn-secondary" style="font-size:0.7rem;">À filmer</button>
+                  </form>
+                  <form method="post"
+                        action="{{ url_for('main.update_creator_stage', task_id=t.id, new_stage='to_edit') }}">
+                    <button class="btn btn-secondary" style="font-size:0.7rem;">À monter</button>
+                  </form>
+                  <form method="post"
+                        action="{{ url_for('main.update_creator_stage', task_id=t.id, new_stage='scheduled') }}">
+                    <button class="btn btn-secondary" style="font-size:0.7rem;">Programmé</button>
+                  </form>
+                  <form method="post"
+                        action="{{ url_for('main.update_creator_stage', task_id=t.id, new_stage='published') }}">
+                    <button class="btn btn-secondary" style="font-size:0.7rem;">Publié</button>
+                  </form>
+
+                  <!-- Terminer -->
+                  <form method="post"
+                        action="{{ url_for('main.update_task_status', task_id=t.id, new_status='done') }}">
+                    <button class="btn btn-primary" style="font-size:0.7rem;">✓ Terminé</button>
+                  </form>
+
+                  <!-- Modifier -->
+                  <a href="{{ url_for('main.edit_task', task_id=t.id) }}">
+                    <button type="button" class="btn btn-secondary" style="font-size:0.7rem;">Modifier</button>
+                  </a>
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <p class="muted" style="font-size:0.8rem;">Aucun contenu ici pour l’instant.</p>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

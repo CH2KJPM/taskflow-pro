@@ -1,0 +1,320 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero-layout">
+  <!-- Colonne gauche : texte -->
+  <div class="card">
+    <div class="hero-badge">
+      <span style="width:8px; height:8px; border-radius:999px; background:linear-gradient(135deg,#6366f1,#ec4899); margin-right:0.35rem;"></span>
+      Pensé pour les créateurs multi-plateformes
+    </div>
+    <h1 class="hero-title">
+      Organise, crée, publie.<br>
+      <span style="background:linear-gradient(135deg,#6366f1,#ec4899); -webkit-background-clip:text; color:transparent;">
+        Tout ton contenu, parfaitement orchestré.
+      </span>
+    </h1>
+    <p class="page-subtitle" style="max-width:520px;">
+      TaskFlow Creator t’aide à gérer tes idées, tournages, montages et publications
+      sur <strong>TikTok</strong>, <strong>Reels</strong> et <strong>YouTube Shorts</strong> – avec une interface
+      claire, premium et pensée comme une app Apple.
+    </p>
+
+    <div class="hero-cta">
+      <a href="{{ url_for('auth.register') }}">
+        <button class="btn btn-primary">
+          Commencer gratuitement
+        </button>
+      </a>
+      <a href="{{ url_for('auth.login') }}">
+        <button class="btn btn-secondary">
+          J’ai déjà un compte
+        </button>
+      </a>
+    </div>
+
+    <p class="muted" style="margin-top:0.8rem; font-size:0.8rem;">
+      Bêta ouverte · 1 créateur = 1 système d’organisation complet · Annulation en un clic.
+    </p>
+  </div>
+
+  <!-- Colonne droite : faux aperçu du produit -->
+  <div class="card-soft" style="position:relative; overflow:hidden;">
+    <div style="
+      position:absolute;
+      inset:-40%;
+      background:radial-gradient(circle at 0 0, rgba(236,72,153,0.35), transparent 55%),
+                 radial-gradient(circle at 100% 100%, rgba(59,130,246,0.4), transparent 50%);
+      opacity:0.65;
+      pointer-events:none;
+    "></div>
+
+    <div style="position:relative;">
+      <p class="page-subtitle" style="margin-top:0; margin-bottom:0.7rem;">
+        Aperçu · Plan éditorial multi-plateformes
+      </p>
+
+      <div style="display:flex; gap:0.4rem; margin-bottom:0.7rem; flex-wrap:wrap;">
+        <span class="pill" style="border-color:rgba(59,130,246,0.7); background:rgba(37,99,235,0.15); color:#dbeafe;">
+          TikTok
+        </span>
+        <span class="pill" style="border-color:rgba(236,72,153,0.8); background:rgba(236,72,153,0.15); color:#fbcfe8;">
+          Reels
+        </span>
+        <span class="pill" style="border-color:rgba(239,68,68,0.8); background:rgba(239,68,68,0.12); color:#fecaca;">
+          YouTube Shorts
+        </span>
+      </div>
+
+      <div class="kanban-columns" style="margin-top:0.4rem;">
+        <div class="kanban-column">
+          <h3>Idées</h3>
+          <div class="task-card">
+            <div class="task-title">“1 secret qui a changé mon montage”</div>
+            <div class="task-meta">
+              <span class="pill pill-medium">TikTok</span>
+              <span class="task-date">Hook + Script prêts</span>
+            </div>
+          </div>
+          <div class="task-card">
+            <div class="task-title">Routine créateur 3h / jour</div>
+            <div class="task-meta">
+              <span class="pill pill-low">Multi</span>
+              <span class="task-date">Idée à valider</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="kanban-column">
+          <h3>À filmer</h3>
+          <div class="task-card">
+            <div class="task-title">Avant / Après montage (CapCut vs pro)</div>
+            <div class="task-meta">
+              <span class="pill pill-medium">Reels</span>
+              <span class="task-date">Film aujourd’hui</span>
+            </div>
+          </div>
+          <div class="task-card">
+            <div class="task-title">Top 3 hacks TikTok en 30s</div>
+            <div class="task-meta">
+              <span class="pill pill-high">TikTok</span>
+              <span class="task-date">Priorité haute</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="kanban-column">
+          <h3>En montage</h3>
+          <div class="task-card">
+            <div class="task-title">“Je teste l’IA pour organiser mes vidéos”</div>
+            <div class="task-meta">
+              <span class="pill pill-medium">YouTube Shorts</span>
+              <span class="task-date">Export ce soir</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="kanban-column">
+          <h3>Programmé</h3>
+          <div class="task-card">
+            <div class="task-title">Story time : mon pire tournage</div>
+            <div class="task-meta">
+              <span class="pill pill-low">Reels</span>
+              <span class="task-date">Demain · 18h00</span>
+            </div>
+          </div>
+          <div class="task-card">
+            <div class="task-title">Annonce d’un sponsor</div>
+            <div class="task-meta">
+              <span class="pill pill-medium">Multi</span>
+              <span class="task-date">Samedi · 12h00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="muted" style="margin-top:0.9rem; font-size:0.75rem;">
+        Interface simulée. Dans ton compte, tu pourras adapter les colonnes, statuts et plateformes à ton workflow.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Section “Pourquoi TaskFlow Creator ?” -->
+<section style="margin-top:3rem;">
+  <div class="card-soft">
+    <h2 class="page-title" style="font-size:1.4rem; margin-top:0;">Pourquoi les créateurs en ont besoin ?</h2>
+    <p class="page-subtitle" style="max-width:620px;">
+      Tu as des dizaines d’idées de vidéos, des tournages à enchaîner, des montages à livrer,
+      des posts à programmer – et tout ça sur plusieurs plateformes. TaskFlow Creator
+      devient ton “cerveau externe” pour ton contenu.
+    </p>
+
+    <div class="projects-grid" style="margin-top:1.4rem;">
+      <div class="project-card">
+        <div class="project-card-title">Centralise toutes tes idées</div>
+        <p class="project-card-desc">
+          Note tes hooks, scripts, formats et idées en 2 clics. Classe-les par plateforme et par type de contenu.
+        </p>
+        <p class="muted" style="font-size:0.8rem;">
+          Fini les notes éparpillées dans 15 apps différentes.
+        </p>
+      </div>
+      <div class="project-card">
+        <div class="project-card-title">Visualise ton mois en un coup d’œil</div>
+        <p class="project-card-desc">
+          Un calendrier éditorial sombre, propre et lisible pour voir ce qui sort, où et quand.
+        </p>
+        <p class="muted" style="font-size:0.8rem;">
+          Tu sais exactement quels jours sont “vides” et quels jours sont chargés.
+        </p>
+      </div>
+      <div class="project-card">
+        <div class="project-card-title">Suis l’avancement de chaque vidéo</div>
+        <p class="project-card-desc">
+          De “Idée” à “Publié” en passant par “À filmer” et “En montage”. Tu vois où tu bloques réellement.
+        </p>
+        <p class="muted" style="font-size:0.8rem;">
+          Parfait pour bosser avec un monteur ou un CM.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Section “Pour quels créateurs ?” -->
+<section style="margin-top:3rem;">
+  <h2 class="page-title" style="font-size:1.3rem;">Pour quels créateurs ?</h2>
+  <p class="page-subtitle" style="max-width:580px;">
+    TaskFlow Creator est pensé pour les créateurs qui veulent traiter leur contenu comme un vrai business.
+  </p>
+
+  <div class="projects-grid" style="margin-top:1.4rem;">
+    <div class="project-card">
+      <div class="project-card-title">Créateurs TikTok & Reels</div>
+      <p class="project-card-desc">
+        Tu publies souvent des vidéos courtes et tu veux garder un rythme constant
+        sans perdre le contrôle sur ce que tu as déjà posté ou prévu.
+      </p>
+      <p class="muted" style="font-size:0.8rem;">
+        Le système parfait pour garder la cadence sans brûler ton cerveau.
+      </p>
+    </div>
+    <div class="project-card">
+      <div class="project-card-title">YouTube Shorts & Vidéos</div>
+      <p class="project-card-desc">
+        Tu gères tournages, montages, miniatures et titres. TaskFlow Creator te
+        permet de tout suivre, même si tu prépares des séries de vidéos.
+      </p>
+      <p class="muted" style="font-size:0.8rem;">
+        Idéal si tu bosses avec un monteur ou un graphiste.
+      </p>
+    </div>
+    <div class="project-card">
+      <div class="project-card-title">Créateurs multi-plateformes</div>
+      <p class="project-card-desc">
+        Tu adaptes tes contenus pour plusieurs réseaux. Tu peux taguer chaque tâche
+        par plateforme et voir ce qui est prévu sur chaque canal.
+      </p>
+      <p class="muted" style="font-size:0.8rem;">
+        Un seul système, toutes tes plateformes.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Section Pricing -->
+<section id="pricing" style="margin-top:3.2rem;">
+  <h2 class="page-title" style="font-size:1.4rem;">Tarification simple pour créateurs</h2>
+  <p class="page-subtitle" style="max-width:620px;">
+    TaskFlow Creator est en version bêta. Tu peux l’utiliser gratuitement dès maintenant.
+    Plus tard, une offre payante viendra se rajouter – tu seras prévenu bien avant.
+  </p>
+
+  <div class="projects-grid" style="margin-top:1.5rem;">
+    <!-- Plan actuel : Bêta gratuite -->
+    <div class="project-card" style="border-color:rgba(34,197,94,0.7); box-shadow:0 18px 40px rgba(22,163,74,0.25);">
+      <div class="project-card-title" style="display:flex; justify-content:space-between; align-items:center;">
+        <span>Starter Créateur (Bêta)</span>
+        <span style="font-size:0.9rem; font-weight:500; color:#bbf7d0;">0.– CHF</span>
+      </div>
+      <div class="project-card-desc" style="margin-bottom:0.9rem;">
+        Pour toi, dès maintenant. Toutes les fonctionnalités actuelles, gratuitement pendant la phase de lancement.
+      </div>
+      <ul class="muted" style="padding-left:1.1rem; margin-top:0; margin-bottom:0.9rem; font-size:0.8rem;">
+        <li>Projets / channels illimités</li>
+        <li>Kanban créateur (idée → filmé → monté → publié)</li>
+        <li>Vue Aujourd’hui + calendrier éditorial</li>
+        <li>Toasts modernes et UI premium</li>
+      </ul>
+      <a href="{{ url_for('auth.register') }}">
+        <button class="btn btn-primary">Créer mon compte gratuit</button>
+      </a>
+      <p class="muted" style="margin-top:0.7rem; font-size:0.75rem;">
+        Ton feedback pendant la bêta aidera à prioriser les prochaines fonctionnalités.
+      </p>
+    </div>
+
+    <!-- Plan futur : Pro (placeholder) -->
+    <div class="project-card" style="opacity:0.7;">
+      <div class="project-card-title" style="display:flex; justify-content:space-between; align-items:center;">
+        <span>Creator Pro (bientôt)</span>
+        <span style="font-size:0.9rem; font-weight:500; color:#fde68a;">à partir de XX CHF</span>
+      </div>
+      <div class="project-card-desc" style="margin-bottom:0.9rem;">
+        Pour les créateurs qui vivent de leur contenu, ou qui veulent le faire.
+        Collaboration, analytics, gestion des sponsors et plus.
+      </div>
+      <ul class="muted" style="padding-left:1.1rem; margin-top:0; margin-bottom:0.9rem; font-size:0.8rem;">
+        <li>Plusieurs membres par espace</li>
+        <li>Suivi avancé des contenus publiés</li>
+        <li>Export du planning éditorial</li>
+        <li>Support prioritaire</li>
+      </ul>
+      <p class="muted" style="font-size:0.75rem;">
+        Ce plan n’est pas encore disponible. L’objectif actuel : stabiliser l’outil et le valider avec les premiers créateurs.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Section FAQ -->
+<section style="margin-top:3rem; margin-bottom:2rem;">
+  <div class="card-soft">
+    <h2 class="page-title" style="font-size:1.3rem; margin-top:0;">Questions fréquentes</h2>
+
+    <div style="margin-top:1.2rem; display:flex; flex-direction:column; gap:0.9rem;">
+      <div>
+        <p class="project-card-title" style="font-size:0.95rem;">Est-ce que TaskFlow Creator est vraiment gratuit ?</p>
+        <p class="muted" style="font-size:0.85rem;">
+          Oui. Pendant la phase bêta, tu peux utiliser toutes les fonctionnalités actuelles sans payer.
+          Quand une offre payante sera proposée, tu auras le choix de rester ou non.
+        </p>
+      </div>
+
+      <div>
+        <p class="project-card-title" style="font-size:0.95rem;">Est-ce que je dois connecter mes comptes TikTok / Insta ?</p>
+        <p class="muted" style="font-size:0.85rem;">
+          Non. TaskFlow Creator ne publie rien à ta place pour l’instant. C’est ton système d’organisation
+          pour savoir quoi poster, où et quand. Tu gardes le contrôle total.
+        </p>
+      </div>
+
+      <div>
+        <p class="project-card-title" style="font-size:0.95rem;">Je travaille avec un monteur, est-ce que ça peut m’aider ?</p>
+        <p class="muted" style="font-size:0.85rem;">
+          Oui. Tu peux créer une tâche par vidéo, suivre le statut (idée, à filmer, en montage, prêt, publié)
+          et centraliser toutes les infos nécessaires pour ton monteur.
+        </p>
+      </div>
+
+      <div>
+        <p class="project-card-title" style="font-size:0.95rem;">Sur quels appareils ça fonctionne ?</p>
+        <p class="muted" style="font-size:0.85rem;">
+          TaskFlow Creator fonctionne dans ton navigateur. Tu peux l’utiliser sur ordinateur, tablette et mobile.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

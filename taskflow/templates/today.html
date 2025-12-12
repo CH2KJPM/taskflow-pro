@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="today-two-cols"
+     style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:1rem; align-items:flex-start;">
+    <div>
+      <h1 class="page-title">Aujourd’hui</h1>
+      <p class="page-subtitle">
+        Vue concentrée sur tes tâches et contenus à traiter le {{ today.strftime("%d.%m.%Y") }}.
+      </p> 
+      <br>
+    </div>
+  </div>
+
+  <!-- Résumé -->
+  <div class="card-soft" style="margin-bottom:1.5rem;">
+      <div>
+        <p class="page-subtitle" style="margin-bottom:0.4rem;">
+          Aujourd’hui, tu as :
+        </p>
+        <div style="display:flex; gap:0.75rem; flex-wrap:wrap; font-size:0.9rem;">
+          <span class="pill" style="background:rgba(59,130,246,0.12); border-color:rgba(59,130,246,0.7); color:#bfdbfe;">
+            {{ total_today }} tâche{{ 's' if total_today != 1 }} au total
+          </span>
+          <span class="pill pill-medium">
+            {{ total_general }} générale{{ 's' if total_general != 1 }}
+          </span>
+          <span class="pill" style="background:rgba(236,72,153,0.12); border-color:rgba(236,72,153,0.7); color:#f9a8d4;">
+            {{ total_content }} contenu{{ 's' if total_content != 1 }}
+          </span>
+      </div>
+      {% if total_today > 0 %}
+        <div style="font-size:0.8rem; color:var(--text-muted); text-align:right;">
+          Conseil : commence par les contenus <strong>“À filmer”</strong> et les tâches à haute priorité 🔥
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Deux colonnes : Général / Contenu -->
+  <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:1rem; align-items:flex-start;">
+
+    <!-- Colonne tâches générales (dues aujourd’hui + en cours) -->
+    <div class="card-soft">
+      <h2 style="font-size:1.05rem; margin-top:0; margin-bottom:0.4rem;">Tâches générales</h2>
+
+      <!-- Tâches générales dues aujourd’hui -->
+      <h3 style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); margin-bottom:0.35rem;">
+        Dues aujourd’hui
+      </h3>
+      {% if general_tasks %}
+        {% for t in general_tasks %}
+          <div class="task-card">
+            <div class="task-title">{{ t.title }}</div>
+
+            {% if t.description %}
+              <div style="font-size:0.78rem; color:var(--text-muted); margin-top:0.15rem;">
+                {{ t.description }}
+              </div>
+            {% endif %}
+
+            <div class="task-meta">
+              <div>
+                {% if t.priority == 'low' %}
+                  <span class="pill pill-low">Basse</span>
+                {% elif t.priority == 'high' %}
+                  <span class="pill pill-high">Haute</span>
+                {% else %}
+                  <span class="pill pill-medium">Moyenne</span>
+                {% endif %}
+              </div>
+              <div class="task-date">
+                {% if t.project %}
+                  Projet : {{ t.project.name }}
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="task-actions" style="margin-top:0.45rem;">
+              {% if t.status != 'done' %}
+                <form method="post"
+                      action="{{ url_for('main.update_task_status', task_id=t.id, new_status='done') }}">
+                  <button class="btn btn-primary" style="font-size:0.75rem;">✓ Marquer comme terminé</button>
+                </form>
+              {% endif %}
+              <a href="{{ url_for('main.edit_task', task_id=t.id) }}">
+                <button type="button" class="btn btn-secondary" style="font-size:0.75rem;">Modifier</button>
+              </a>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="muted">Aucune tâche générale due aujourd’hui.</p>
+      {% endif %}
+
+      <!-- Séparateur -->
+      <hr style="border:none; border-top:1px solid rgba(31,41,55,0.9); margin:0.9rem 0;">
+
+      <!-- Tâches générales en cours (toutes dates) -->
+      <h3 style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); margin-bottom:0.35rem;">
+        En cours
+      </h3>
+      {% if general_in_progress %}
+        {% for t in general_in_progress %}
+          <div class="task-card">
+            <div class="task-title">{{ t.title }}</div>
+
+            {% if t.description %}
+              <div style="font-size:0.78rem; color:var(--text-muted); margin-top:0.15rem;">
+                {{ t.description }}
+              </div>
+            {% endif %}
+
+            <div class="task-meta">
+              <div>
+                {% if t.priority == 'low' %}
+                  <span class="pill pill-low">Basse</span>
+                {% elif t.priority == 'high' %}
+                  <span class="pill pill-high">Haute</span>
+                {% else %}
+                  <span class="pill pill-medium">Moyenne</span>
+                {% endif %}
+              </div>
+              <div class="task-date">
+                {% if t.project %}
+                  Projet : {{ t.project.name }}
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="task-actions" style="margin-top:0.45rem;">
+              <form method="post"
+                    action="{{ url_for('main.update_task_status', task_id=t.id, new_status='done') }}">
+                <button class="btn btn-primary" style="font-size:0.75rem;">✓ Terminé</button>
+              </form>
+              <a href="{{ url_for('main.edit_task', task_id=t.id) }}">
+                <button type="button" class="btn btn-secondary" style="font-size:0.75rem;">Modifier</button>
+              </a>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="muted">Aucune tâche générale en cours pour le moment.</p>
+      {% endif %}
+    </div>
+
+    <!-- Colonne contenus -->
+    <div class="card-soft">
+      <h2 style="font-size:1.05rem; margin-top:0; margin-bottom:0.4rem;">Contenus aujourd’hui</h2>
+
+      {% set stages_order = ['to_film', 'to_edit', 'scheduled', 'published', 'idea', 'none'] %}
+      {% set stages_labels = {
+        'to_film': 'À filmer',
+        'to_edit': 'À monter',
+        'scheduled': 'Programmé',
+        'published': 'Publié',
+        'idea': 'Idées',
+        'none': 'Sans étape'
+      } %}
+
+      {% set any_content = false %}
+      {% for s in stages_order %}
+        {% if content_by_stage[s]|length > 0 %}
+          {% set any_content = true %}
+          <div style="margin-bottom:0.8rem;">
+            <h3 style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); margin-bottom:0.35rem;">
+              {{ stages_labels[s] }}
+            </h3>
+
+            {% for t in content_by_stage[s] %}
+              <div class="task-card" style="margin-bottom:0.35rem;">
+                <div class="task-title">{{ t.title }}</div>
+
+                {% if t.description %}
+                  <div style="font-size:0.78rem; color:var(--text-muted); margin-top:0.15rem;">
+                    {{ t.description }}
+                  </div>
+                {% endif %}
+
+                <div class="task-meta">
+                  <div style="display:flex; gap:0.25rem; flex-wrap:wrap;">
+                    <!-- Plateforme -->
+                    {% if t.platform == "tiktok" %}
+                      <span class="pill" style="background:rgba(248,113,113,0.12); border-color:rgba(248,113,113,0.7); color:#fecaca;">
+                        TikTok
+                      </span>
+                    {% elif t.platform == "instagram" %}
+                      <span class="pill" style="background:rgba(236,72,153,0.12); border-color:rgba(236,72,153,0.7); color:#f9a8d4;">
+                        Instagram
+                      </span>
+                    {% elif t.platform == "youtube" %}
+                      <span class="pill" style="background:rgba(248,113,113,0.12); border-color:rgba(239,68,68,0.8); color:#fecaca;">
+                        YouTube
+                      </span>
+                    {% elif t.platform == "other" %}
+                      <span class="pill" style="background:rgba(59,130,246,0.12); border-color:rgba(59,130,246,0.7); color:#bfdbfe;">
+                        Multi / Autre
+                      </span>
+                    {% else %}
+                      <span class="pill" style="background:rgba(148,163,184,0.12); border-color:rgba(148,163,184,0.6); color:#e5e7eb;">
+                        Contenu
+                      </span>
+                    {% endif %}
+
+                    <!-- Priorité -->
+                    {% if t.priority == 'low' %}
+                      <span class="pill pill-low">Basse</span>
+                    {% elif t.priority == 'high' %}
+                      <span class="pill pill-high">Haute</span>
+                    {% else %}
+                      <span class="pill pill-medium">Moyenne</span>
+                    {% endif %}
+                  </div>
+                  <div class="task-date">
+                    {% if t.project %}
+                      {{ t.project.name }}
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="task-actions" style="margin-top:0.45rem;">
+                  {% if t.status != 'done' %}
+                    <form method="post"
+                          action="{{ url_for('main.update_task_status', task_id=t.id, new_status='done') }}">
+                      <button class="btn btn-primary" style="font-size:0.75rem;">✓ Terminé</button>
+                    </form>
+                  {% endif %}
+                  <a href="{{ url_for('main.edit_task', task_id=t.id) }}">
+                    <button type="button" class="btn btn-secondary" style="font-size:0.75rem;">Modifier</button>
+                  </a>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endfor %}
+
+      <!-- Contenus en cours (toutes dates) -->
+      <hr style="border:none; border-top:1px solid rgba(31,41,55,0.9); margin:0.9rem 0;">
+      <h3 style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); margin-bottom:0.35rem;">
+        En cours
+      </h3>
+
+      {% if content_in_progress %}
+        {% for t in content_in_progress %}
+          <div class="task-card" style="margin-bottom:0.35rem;">
+            <div class="task-title">{{ t.title }}</div>
+
+            {% if t.description %}
+              <div style="font-size:0.78rem; color:var(--text-muted); margin-top:0.15rem;">
+                {{ t.description }}
+              </div>
+            {% endif %}
+
+            <div class="task-meta">
+              <div style="display:flex; gap:0.25rem; flex-wrap:wrap;">
+                <!-- Plateforme -->
+                {% if t.platform == "tiktok" %}
+                  <span class="pill" style="background:rgba(248,113,113,0.12); border-color:rgba(248,113,113,0.7); color:#fecaca;">
+                    TikTok
+                  </span>
+                {% elif t.platform == "instagram" %}
+                  <span class="pill" style="background:rgba(236,72,153,0.12); border-color:rgba(236,72,153,0.7); color:#f9a8d4;">
+                    Instagram
+                  </span>
+                {% elif t.platform == "youtube" %}
+                  <span class="pill" style="background:rgba(248,113,113,0.12); border-color:rgba(239,68,68,0.8); color:#fecaca;">
+                    YouTube
+                  </span>
+                {% elif t.platform == "other" %}
+                  <span class="pill" style="background:rgba(59,130,246,0.12); border-color:rgba(59,130,246,0.7); color:#bfdbfe;">
+                    Multi / Autre
+                  </span>
+                {% else %}
+                  <span class="pill" style="background:rgba(148,163,184,0.12); border-color:rgba(148,163,184,0.6); color:#e5e7eb;">
+                    Contenu
+                  </span>
+                {% endif %}
+
+                <!-- Priorité -->
+                {% if t.priority == 'low' %}
+                  <span class="pill pill-low">Basse</span>
+                {% elif t.priority == 'high' %}
+                  <span class="pill pill-high">Haute</span>
+                {% else %}
+                  <span class="pill pill-medium">Moyenne</span>
+                {% endif %}
+              </div>
+              <div class="task-date">
+                {% if t.project %}
+                  {{ t.project.name }}
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="task-actions" style="margin-top:0.45rem;">
+              <form method="post"
+                    action="{{ url_for('main.update_task_status', task_id=t.id, new_status='done') }}">
+                <button class="btn btn-primary" style="font-size:0.75rem;">✓ Terminé</button>
+              </form>
+              <a href="{{ url_for('main.edit_task', task_id=t.id) }}">
+                <button type="button" class="btn btn-secondary" style="font-size:0.75rem;">Modifier</button>
+              </a>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        {% if not any_content %}
+          <p class="muted">Aucun contenu spécifique à produire ou en cours pour le moment.</p>
+        {% else %}
+          <p class="muted">Aucun contenu en cours pour le moment.</p>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

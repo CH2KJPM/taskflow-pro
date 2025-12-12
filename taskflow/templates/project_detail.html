@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="page-header">
+  <div class="page-header-text">
+    <h1 class="page-title">{{ project.name }}</h1>
+    <p class="page-subtitle">{{ project.description or "—" }}</p>
+  </div>
+
+  <div class="page-actions">
+    <div class="page-actions-row">
+      <a href="{{ url_for('main.dashboard') }}"><button class="btn btn-secondary" type="button">Dashboard</button></a>
+      <a href="{{ url_for('main.calendar_view', view='week') }}"><button class="btn btn-secondary" type="button">Calendrier</button></a>
+    </div>
+  </div>
+</div>
+
+<!-- Form ajout tâche -->
+<div class="card-soft" style="margin-bottom:1rem;">
+  <form method="post" action="{{ url_for('main.add_task', project_id=project.id) }}"
+        style="display:grid; grid-template-columns: 1fr 1fr; gap:0.75rem; align-items:end;">
+    <div style="grid-column: 1 / -1;">
+      <label>Titre</label>
+      <input class="input" name="title" placeholder="Titre de la tâche" required>
+    </div>
+
+    <div style="grid-column: 1 / -1;">
+      <label>Description (optionnel)</label>
+      <textarea class="textarea" name="description" placeholder="Détails…"></textarea>
+    </div>
+
+    <div>
+      <label>Priorité</label>
+      <select class="select" name="priority">
+        <option value="low">Basse</option>
+        <option value="medium" selected>Moyenne</option>
+        <option value="high">Haute</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Date limite (optionnel)</label>
+      <input class="input" type="date" name="due_date">
+    </div>
+
+    <div>
+      <label>Type de tâche</label>
+      <select class="select" name="task_type">
+        <option value="general" selected>Général</option>
+        <option value="content">Contenu</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Plateforme (si contenu)</label>
+      <select class="select" name="platform">
+        <option value="">Aucune / non défini</option>
+        <option value="tiktok">TikTok</option>
+        <option value="instagram">Instagram</option>
+        <option value="youtube">YouTube</option>
+        <option value="other">Autre / multi</option>
+      </select>
+    </div>
+
+    <div style="grid-column: 1 / -1;">
+      <label>Étape du contenu</label>
+      <select class="select" name="creator_stage">
+        <option value="">Aucune / Général</option>
+        <option value="idea">Idée</option>
+        <option value="to_film">À filmer</option>
+        <option value="to_edit">À monter</option>
+        <option value="scheduled">Programmé</option>
+        <option value="published">Publié</option>
+      </select>
+    </div>
+
+    <div style="grid-column: 1 / -1; display:flex; justify-content:flex-end;">
+      <button class="btn btn-primary" type="submit">Ajouter la tâche</button>
+    </div>
+  </form>
+</div>
+
+<style>
+  /* Kanban responsive */
+  .kanban-grid{
+    display:grid;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap:1rem;
+  }
+  .kanban-col{
+    border:1px solid rgba(31,41,55,0.8);
+    background: rgba(15,23,42,0.95);
+    border-radius: var(--radius-lg);
+    padding:1rem;
+    min-height: 120px;
+  }
+  .kanban-title{
+    font-weight:650;
+    margin:0 0 .75rem;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .task-item{
+    border:1px solid rgba(31,41,55,0.8);
+    background: rgba(2,6,23,0.55);
+    border-radius: 14px;
+    padding: .75rem;
+    margin-bottom:.6rem;
+  }
+  .task-item:last-child{ margin-bottom:0; }
+  .task-actions{
+    display:flex;
+    gap:.4rem;
+    flex-wrap:wrap;
+    margin-top:.6rem;
+  }
+  @media (max-width: 768px){
+    .kanban-grid{ grid-template-columns: 1fr; }
+    form[style*="grid-template-columns"]{ grid-template-columns: 1fr !important; }
+  }
+</style>
+
+<div class="kanban-grid">
+  <!-- TODO -->
+  <div class="kanban-col">
+    <div class="kanban-title">
+      <span>À faire</span>
+      <span class="muted">{{ tasks_todo|length }}</span>
+    </div>
+
+    {% for task in tasks_todo %}
+      <div class="task-item js-task-open" data-task-id="{{ task.id }}" style="cursor:pointer;">
+        <div style="font-weight:650;">{{ task.title }}</div>
+        <div class="muted" style="margin-top:.15rem;">{{ task.description or "" }}</div>
+
+        <div style="margin-top:.45rem; display:flex; gap:.35rem; flex-wrap:wrap;">
+          <span class="pill pill-medium">{{ task.priority }}</span>
+          {% if task.due_date %}
+            <span class="pill pill-medium">Échéance: {{ task.due_date.strftime("%d.%m.%Y") }}</span>
+          {% endif %}
+        </div>
+
+        <div class="task-actions" onclick="event.stopPropagation();">
+          <form method="post" action="{{ url_for('main.update_task_status', task_id=task.id, new_status='in_progress') }}">
+            <button class="btn btn-secondary" type="submit">→ En cours</button>
+          </form>
+          <a class="btn btn-secondary" href="{{ url_for('main.edit_task', task_id=task.id) }}">Modifier</a>
+          <form method="post" action="{{ url_for('main.delete_task', task_id=task.id) }}">
+            <button class="btn btn-danger" type="submit">Supprimer</button>
+          </form>
+        </div>
+      </div>
+    {% else %}
+      <p class="muted">Aucune tâche.</p>
+    {% endfor %}
+  </div>
+
+  <!-- IN PROGRESS -->
+  <div class="kanban-col">
+    <div class="kanban-title">
+      <span>En cours</span>
+      <span class="muted">{{ tasks_in_progress|length }}</span>
+    </div>
+
+    {% for task in tasks_in_progress %}
+      <div class="task-item js-task-open" data-task-id="{{ task.id }}" style="cursor:pointer;">
+        <div style="font-weight:650;">{{ task.title }}</div>
+        <div class="muted" style="margin-top:.15rem;">{{ task.description or "" }}</div>
+
+        <div style="margin-top:.45rem; display:flex; gap:.35rem; flex-wrap:wrap;">
+          <span class="pill pill-medium">{{ task.priority }}</span>
+          {% if task.due_date %}
+            <span class="pill pill-medium">Échéance: {{ task.due_date.strftime("%d.%m.%Y") }}</span>
+          {% endif %}
+        </div>
+
+        <div class="task-actions" onclick="event.stopPropagation();">
+          <form method="post" action="{{ url_for('main.update_task_status', task_id=task.id, new_status='done') }}">
+            <button class="btn btn-secondary" type="submit">✓ Terminer</button>
+          </form>
+          <a class="btn btn-secondary" href="{{ url_for('main.edit_task', task_id=task.id) }}">Modifier</a>
+          <form method="post" action="{{ url_for('main.delete_task', task_id=task.id) }}">
+            <button class="btn btn-danger" type="submit">Supprimer</button>
+          </form>
+        </div>
+      </div>
+    {% else %}
+      <p class="muted">Aucune tâche en cours.</p>
+    {% endfor %}
+  </div>
+
+  <!-- DONE -->
+  <div class="kanban-col">
+    <div class="kanban-title">
+      <span>Terminé</span>
+      <span class="muted">{{ tasks_done|length }}</span>
+    </div>
+
+    {% for task in tasks_done %}
+      <div class="task-item js-task-open" data-task-id="{{ task.id }}" style="cursor:pointer;">
+        <div style="font-weight:650;">{{ task.title }}</div>
+        <div class="muted" style="margin-top:.15rem;">{{ task.description or "" }}</div>
+
+        <div class="task-actions" onclick="event.stopPropagation();">
+          <form method="post" action="{{ url_for('main.update_task_status', task_id=task.id, new_status='todo') }}">
+            <button class="btn btn-secondary" type="submit">↩︎ Refaire</button>
+          </form>
+        </div>
+      </div>
+    {% else %}
+      <p class="muted">Rien de terminé pour le moment.</p>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}

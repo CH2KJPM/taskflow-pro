@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card-soft" style="padding:1.2rem; display:flex; flex-direction:column; gap:1rem;">
+
+  <!-- ===== Header ===== -->
+  <div class="task-header" style="
+    display:flex;
+    justify-content:space-between;
+    gap:0.75rem;
+    align-items:flex-start;
+    flex-wrap:wrap;
+  ">
+    <div style="min-width:0;">
+      <h1 class="page-title" style="margin:0 0 0.25rem; word-break:break-word;">
+        {{ task.title }}
+      </h1>
+
+      <!-- Breadcrumb -->
+      <nav class="muted" style="font-size:0.8rem;">
+        <a href="{{ url_for('main.calendar_view', view='week') }}">Calendrier</a>
+        <span> › </span>
+        <a href="{{ url_for('main.project_detail', project_id=task.project_id) }}">
+          {{ task.project.name }}
+        </a>
+        <span> › </span>
+        <span>{{ task.title }}</span>
+      </nav>
+    </div>
+
+    <!-- Header actions -->
+    <div class="task-actions" style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+      <a class="btn btn-secondary"
+         href="{{ url_for('main.calendar_view', view='week') }}">
+        ← Calendrier
+      </a>
+      <a class="btn btn-secondary"
+         href="{{ url_for('main.project_detail', project_id=task.project_id) }}">
+        Projet
+      </a>
+      <a class="btn btn-primary"
+         href="{{ url_for('main.edit_task', task_id=task.id) }}">
+        Modifier
+      </a>
+    </div>
+  </div>
+
+  <!-- ===== Description ===== -->
+  <div>
+    <label>Description</label>
+    <div class="muted" style="white-space:pre-wrap;">
+      {{ task.description or "—" }}
+    </div>
+  </div>
+
+  <!-- ===== Meta pills ===== -->
+  <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+
+    {% if task.priority == 'low' %}
+      <span class="pill pill-low">Priorité · Basse</span>
+    {% elif task.priority == 'high' %}
+      <span class="pill pill-high">Priorité · Haute</span>
+    {% else %}
+      <span class="pill pill-medium">Priorité · Moyenne</span>
+    {% endif %}
+
+    {% if task.status == 'todo' %}
+      <span class="pill pill-medium">Statut · À faire</span>
+    {% elif task.status == 'in_progress' %}
+      <span class="pill pill-medium">Statut · En cours</span>
+    {% else %}
+      <span class="pill pill-medium">Statut · Terminé</span>
+    {% endif %}
+
+    {% if task.task_type == 'content' %}
+      <span class="pill"
+            style="background:rgba(236,72,153,0.12);
+                   border-color:rgba(236,72,153,0.6);
+                   color:#f9a8d4;">
+        Type · Contenu
+      </span>
+    {% else %}
+      <span class="pill"
+            style="background:rgba(148,163,184,0.12);
+                   border-color:rgba(148,163,184,0.6);
+                   color:#e5e7eb;">
+        Type · Général
+      </span>
+    {% endif %}
+
+    {% if task.platform %}
+      <span class="pill pill-medium">Plateforme · {{ task.platform }}</span>
+    {% endif %}
+
+    {% if task.creator_stage %}
+      <span class="pill pill-medium">Étape · {{ task.creator_stage }}</span>
+    {% endif %}
+
+    {% if task.due_date %}
+      <span class="pill pill-medium">
+        Échéance · {{ task.due_date.strftime("%d.%m.%Y") }}
+      </span>
+    {% endif %}
+  </div>
+
+  <!-- ===== Status actions ===== -->
+  <div class="task-status-actions" style="
+    display:flex;
+    gap:0.5rem;
+    flex-wrap:wrap;
+    margin-top:0.5rem;
+  ">
+    <form method="post"
+          action="{{ url_for('main.update_task_status', task_id=task.id, new_status='todo') }}">
+      <button class="btn btn-secondary" type="submit">À faire</button>
+    </form>
+
+    <form method="post"
+          action="{{ url_for('main.update_task_status', task_id=task.id, new_status='in_progress') }}">
+      <button class="btn btn-secondary" type="submit">En cours</button>
+    </form>
+
+    <form method="post"
+          action="{{ url_for('main.update_task_status', task_id=task.id, new_status='done') }}">
+      <button class="btn btn-primary" type="submit">Terminer ✅</button>
+    </form>
+
+    <form method="post"
+          action="{{ url_for('main.delete_task', task_id=task.id) }}"
+          onsubmit="return confirm('Supprimer cette tâche ?');">
+      <button class="btn btn-danger" type="submit">Supprimer</button>
+    </form>
+  </div>
+
+</div>
+
+<!-- ===== Mobile rules ===== -->
+<style>
+@media (max-width:768px){
+  .task-actions,
+  .task-status-actions{
+    width:100%;
+  }
+  .task-actions .btn,
+  .task-status-actions form,
+  .task-status-actions .btn{
+    width:100%;
+    justify-content:center;
+  }
+}
+</style>
+
+{% endblock %}

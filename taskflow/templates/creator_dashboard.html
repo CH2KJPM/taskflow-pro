@@ -1,0 +1,385 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <!-- Header -->
+  <div class="page-header-flex"
+     style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; margin-bottom:1.5rem;">
+    <div>
+      <h1 class="page-title">Espace Créateur</h1>
+      <p class="page-subtitle">
+        Ton hub pour piloter tes contenus 🎬 — vue basée sur tes tâches de type “contenu”.
+      </p>
+    </div>
+    <div style="display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:flex-end;">
+      <a href="{{ url_for('main.dashboard') }}">
+        <button class="btn btn-secondary">Dashboard</button>
+      </a>
+      <a href="{{ url_for('main.today') }}">
+        <button class="btn btn-secondary">Aujourd’hui</button>
+      </a>
+      <a href="{{ url_for('main.calendar_view', view='week') }}">
+        <button class="btn btn-secondary">Calendrier</button>
+      </a>
+    </div>
+  </div>
+
+  <!-- FOCUS DU JOUR -->
+  {% if focus_content %}
+    <div class="card"
+         style="
+           margin-bottom:1.5rem;
+           display:flex;
+           gap:1.2rem;
+           align-items:flex-start;
+           border-image: linear-gradient(135deg, #22c55e, #3b82f6, #a855f7) 1;
+           border-width:1px;
+           border-style:solid;
+         ">
+      <div style="flex:1; min-width:0;">
+        <div class="hero-badge" style="margin-bottom:0.6rem; display:inline-flex; align-items:center; gap:0.35rem;">
+          <span>🎯 Focus du jour</span>
+          <span style="width:5px; height:5px; border-radius:999px; background:#22c55e;"></span>
+          <span style="font-size:0.75rem; color:var(--text-muted);">
+            {{ today.strftime("%d.%m.%Y") }}
+          </span>
+        </div>
+
+        <h2 style="font-size:1.35rem; margin:0 0 0.35rem;">
+          {{ focus_content.title }}
+        </h2>
+
+        {% if focus_content.description %}
+          <p style="margin:0 0 0.6rem; font-size:0.9rem; color:var(--text-muted); max-width:520px;">
+            {{ focus_content.description }}
+          </p>
+        {% endif %}
+
+        <div style="display:flex; flex-wrap:wrap; gap:0.4rem; align-items:center; margin-bottom:0.5rem;">
+          <!-- Étape créateur -->
+          {% if focus_content.creator_stage == "to_film" %}
+            <span class="pill" style="background:rgba(239,68,68,0.12); border-color:rgba(239,68,68,0.7); color:#fecaca;">
+              À filmer
+            </span>
+          {% elif focus_content.creator_stage == "to_edit" %}
+            <span class="pill" style="background:rgba(234,179,8,0.12); border-color:rgba(234,179,8,0.8); color:#facc15;">
+              À monter
+            </span>
+          {% elif focus_content.creator_stage == "scheduled" %}
+            <span class="pill" style="background:rgba(16,185,129,0.12); border-color:rgba(16,185,129,0.8); color:#6ee7b7;">
+              Programmé
+            </span>
+          {% elif focus_content.creator_stage == "published" %}
+            <span class="pill" style="background:rgba(52,211,153,0.12); border-color:rgba(16,185,129,0.9); color:#bbf7d0;">
+              Publié
+            </span>
+          {% else %}
+            <span class="pill" style="background:rgba(148,163,184,0.12); border-color:rgba(148,163,184,0.7); color:#e5e7eb;">
+              Contenu
+            </span>
+          {% endif %}
+
+          <!-- Plateforme -->
+          {% if focus_content.platform == "tiktok" %}
+            <span class="pill" style="background:rgba(248,113,113,0.12); border-color:rgba(248,113,113,0.7); color:#fecaca;">
+              TikTok
+            </span>
+          {% elif focus_content.platform == "instagram" %}
+            <span class="pill" style="background:rgba(236,72,153,0.12); border-color:rgba(236,72,153,0.7); color:#f9a8d4;">
+              Instagram
+            </span>
+          {% elif focus_content.platform == "youtube" %}
+            <span class="pill" style="background:rgba(248,113,113,0.12); border-color:rgba(239,68,68,0.8); color:#fecaca;">
+              YouTube
+            </span>
+          {% elif focus_content.platform == "other" %}
+            <span class="pill" style="background:rgba(59,130,246,0.12); border-color:rgba(59,130,246,0.7); color:#bfdbfe;">
+              Multi / autre
+            </span>
+          {% endif %}
+
+          <!-- Priorité -->
+          {% if focus_content.priority == "high" %}
+            <span class="pill pill-high">🔥 Priorité haute</span>
+          {% elif focus_content.priority == "low" %}
+            <span class="pill pill-low">Priorité basse</span>
+          {% else %}
+            <span class="pill pill-medium">Priorité moyenne</span>
+          {% endif %}
+        </div>
+
+        <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.7rem;">
+          {% if focus_content.due_date %}
+            🎬 À traiter pour le <strong>{{ focus_content.due_date.strftime("%d.%m.%Y") }}</strong>
+          {% else %}
+            🎬 Aucun jour précis, mais c’est ton contenu prioritaire du moment.
+          {% endif %}
+          {% if focus_content.project %}
+            • Projet : <strong>{{ focus_content.project.name }}</strong>
+          {% endif %}
+        </div>
+
+        <div style="font-size:0.8rem; color:var(--text-muted);">
+          {% if focus_content.creator_stage == "to_film" %}
+            Conseil : prépare ton setup, écris 3–4 bullet points, et filme ce contenu en premier 🔥
+          {% elif focus_content.creator_stage == "to_edit" %}
+            Conseil : bloque 30 minutes pour monter cette vidéo — même un montage simple vaut mieux que rien 💻
+          {% elif focus_content.creator_stage == "scheduled" %}
+            Conseil : vérifie la miniature, la description, et les hashtags avant la diffusion ✅
+          {% else %}
+            Conseil : clarifie l’étape suivante (filmer, monter ou programmer) pour que ce contenu avance.
+          {% endif %}
+        </div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:0.4rem; min-width:190px; align-items:flex-end;">
+        {% if focus_content.status != "in_progress" %}
+          <form method="post"
+                action="{{ url_for('main.update_task_status', task_id=focus_content.id, new_status='in_progress') }}"
+                style="margin:0;">
+            <button class="btn btn-secondary" style="font-size:0.8rem; width:100%;">🚀 Passer en cours</button>
+          </form>
+        {% endif %}
+
+        {% if focus_content.status != "done" %}
+          <form method="post"
+                action="{{ url_for('main.update_task_status', task_id=focus_content.id, new_status='done') }}"
+                style="margin:0;">
+            <button class="btn btn-primary" style="font-size:0.8rem; width:100%;">✓ Marquer comme terminé</button>
+          </form>
+        {% endif %}
+
+        <a href="{{ url_for('main.edit_task', task_id=focus_content.id) }}" style="width:100%;">
+          <button type="button" class="btn btn-secondary" style="font-size:0.8rem; width:100%;">✏️ Voir / Modifier</button>
+        </a>
+      </div>
+    </div>
+  {% else %}
+    <div class="card-soft" style="margin-bottom:1.5rem; display:flex; justify-content:space-between; align-items:center; gap:1rem;">
+      <div>
+        <div class="hero-badge" style="margin-bottom:0.4rem;">
+          🎯 Focus du jour
+        </div>
+        <p class="page-subtitle" style="margin:0;">
+          Tu n’as pas encore de contenu prioritaire sélectionné.  
+          Commence par créer une tâche de type “contenu” avec une étape <strong>À filmer</strong> ou <strong>À monter</strong>.
+        </p>
+      </div>
+      <a href="{{ url_for('main.create_project') }}">
+        <button class="btn btn-primary" style="font-size:0.85rem;">+ Créer un projet / contenu</button>
+      </a>
+    </div>
+  {% endif %}
+
+  <!-- STATS QUICK VIEW -->
+  <div class="card-soft" style="margin-bottom:1.5rem;">
+    <div style="display:flex; flex-wrap:wrap; gap:1rem; justify-content:space-between; align-items:center;">
+      <div>
+        <p class="page-subtitle" style="margin-bottom:0.4rem;">
+          Aujourd’hui : {{ today.strftime("%d.%m.%Y") }}
+        </p>
+        <div style="display:flex; gap:0.75rem; flex-wrap:wrap; font-size:0.9rem;">
+          <span class="pill" style="background:rgba(59,130,246,0.12); border-color:rgba(59,130,246,0.7); color:#bfdbfe;">
+            {{ total_contents }} contenu{{ 's' if total_contents != 1 }} au total
+          </span>
+          <span class="pill" style="background:rgba(96,165,250,0.12); border-color:rgba(59,130,246,0.7); color:#dbeafe;">
+            {{ contents_to_film }} à filmer
+          </span>
+          <span class="pill" style="background:rgba(251,191,36,0.12); border-color:rgba(245,158,11,0.7); color:#facc15;">
+            {{ contents_to_edit }} à monter
+          </span>
+          <span class="pill" style="background:rgba(16,185,129,0.12); border-color:rgba(16,185,129,0.7); color:#6ee7b7;">
+            {{ contents_scheduled }} programmé{{ 's' if contents_scheduled != 1 }}
+          </span>
+        </div>
+      </div>
+
+      <div style="font-size:0.8rem; color:var(--text-muted); text-align:right;">
+        {% if contents_scheduled_today > 0 %}
+          🎯 {{ contents_scheduled_today }} contenu{{ 's' if contents_scheduled_today != 1 }}
+          sont programmés pour aujourd’hui.<br>
+          Pense à vérifier les miniatures et descriptions !
+        {% else %}
+          Conseil : planifie au moins un contenu par jour pour garder le rythme 📆
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- GRID PRINCIPALE -->
+  <div class="creator-main-grid"
+     style="display:grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap:1rem; align-items:flex-start;">
+     
+    <!-- COLONNE GAUCHE : Prochains contenus (7 jours) -->
+    <div class="card-soft">
+      <h2 style="font-size:1.05rem; margin-top:0; margin-bottom:0.4rem;">Prochains contenus (7 jours)</h2>
+      <p class="muted" style="margin-bottom:0.8rem; font-size:0.8rem;">
+        Tout ce qui est daté entre aujourd’hui et J+7, hors contenus terminés.
+      </p>
+
+      {% if upcoming_contents %}
+        {% for t in upcoming_contents %}
+          <div class="task-card" style="margin-bottom:0.4rem;">
+            <div class="task-title">
+              {{ t.title }}
+            </div>
+
+            {% if t.description %}
+              <div style="font-size:0.78rem; color:var(--text-muted); margin-top:0.15rem;">
+                {{ t.description }}
+              </div>
+            {% endif %}
+
+            <div class="task-meta">
+              <div style="display:flex; gap:0.3rem; flex-wrap:wrap;">
+                {% if t.creator_stage == "to_film" %}
+                  <span class="pill" style="background:rgba(239,68,68,0.12); border-color:rgba(239,68,68,0.7); color:#fecaca;">
+                    À filmer
+                  </span>
+                {% elif t.creator_stage == "to_edit" %}
+                  <span class="pill" style="background:rgba(234,179,8,0.12); border-color:rgba(234,179,8,0.8); color:#facc15;">
+                    À monter
+                  </span>
+                {% elif t.creator_stage == "scheduled" %}
+                  <span class="pill" style="background:rgba(16,185,129,0.12); border-color:rgba(16,185,129,0.8); color:#6ee7b7;">
+                    Programmé
+                  </span>
+                {% elif t.creator_stage == "published" %}
+                  <span class="pill" style="background:rgba(52,211,153,0.12); border-color:rgba(16,185,129,0.9); color:#bbf7d0;">
+                    Publié
+                  </span>
+                {% else %}
+                  <span class="pill" style="background:rgba(148,163,184,0.12); border-color:rgba(148,163,184,0.7); color:#e5e7eb;">
+                    Autre
+                  </span>
+                {% endif %}
+
+                {% if t.platform == "tiktok" %}
+                  <span class="pill" style="background:rgba(248,113,113,0.12); border-color:rgba(248,113,113,0.7); color:#fecaca;">
+                    TikTok
+                  </span>
+                {% elif t.platform == "instagram" %}
+                  <span class="pill" style="background:rgba(236,72,153,0.12); border-color:rgba(236,72,153,0.7); color:#f9a8d4;">
+                    Instagram
+                  </span>
+                {% elif t.platform == "youtube" %}
+                  <span class="pill" style="background:rgba(248,113,113,0.12); border-color:rgba(239,68,68,0.8); color:#fecaca;">
+                    YouTube
+                  </span>
+                {% elif t.platform == "other" %}
+                  <span class="pill" style="background:rgba(59,130,246,0.12); border-color:rgba(59,130,246,0.7); color:#bfdbfe;">
+                    Multi / autre
+                  </span>
+                {% endif %}
+              </div>
+
+              <div class="task-date">
+                {% if t.due_date %}
+                  {{ t.due_date.strftime("%d.%m.%Y") }}
+                {% endif %}
+                {% if t.project %}
+                  • {{ t.project.name }}
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="task-actions" style="margin-top:0.45rem;">
+              {% if t.status != "done" %}
+                <form method="post"
+                      action="{{ url_for('main.update_task_status', task_id=t.id, new_status='done') }}">
+                  <button class="btn btn-primary" style="font-size:0.75rem;">✓ Terminé</button>
+                </form>
+              {% endif %}
+              <a href="{{ url_for('main.edit_task', task_id=t.id) }}">
+                <button type="button" class="btn btn-secondary" style="font-size:0.75rem;">Modifier</button>
+              </a>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="muted">Aucun contenu programmé sur les 7 prochains jours.</p>
+      {% endif %}
+    </div>
+
+    <!-- COLONNE DROITE : Backlog idées + sans date -->
+    <div style="display:flex; flex-direction:column; gap:1rem;">
+
+      <!-- Boîte à idées -->
+      <div class="card-soft">
+        <h2 style="font-size:1.05rem; margin-top:0; margin-bottom:0.4rem;">Boîte à idées</h2>
+        <p class="muted" style="margin-bottom:0.8rem; font-size:0.8rem;">
+          Toutes les tâches de contenu en étape <strong>idée</strong>.
+        </p>
+
+        {% if backlog_ideas %}
+          {% for t in backlog_ideas %}
+            <div class="task-card" style="margin-bottom:0.3rem;">
+              <div class="task-title">{{ t.title }}</div>
+              {% if t.description %}
+                <div style="font-size:0.78rem; color:var(--text-muted); margin-top:0.15rem;">
+                  {{ t.description }}
+                </div>
+              {% endif %}
+              <div class="task-meta">
+                <div class="muted" style="font-size:0.75rem;">
+                  Créé le {{ t.created_at.strftime("%d.%m.%Y") }}
+                  {% if t.project %} • {{ t.project.name }}{% endif %}
+                </div>
+              </div>
+              <div class="task-actions" style="margin-top:0.4rem;">
+                <a href="{{ url_for('main.edit_task', task_id=t.id) }}">
+                  <button type="button" class="btn btn-secondary" style="font-size:0.75rem;">Préparer / Planifier</button>
+                </a>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="muted">Pas encore d’idées sauvegardées. Quand tu as une idée, crée une tâche de type “contenu” avec étape <strong>Idée</strong>.</p>
+        {% endif %}
+      </div>
+
+      <!-- Backlog sans date -->
+      <div class="card-soft">
+        <h2 style="font-size:1.05rem; margin-top:0; margin-bottom:0.4rem;">Backlog sans date</h2>
+        <p class="muted" style="margin-bottom:0.8rem; font-size:0.8rem;">
+          Contenus de type “contenu” sans date limite — à planifier dans ton calendrier éditorial.
+        </p>
+
+        {% if backlog_no_date %}
+          {% for t in backlog_no_date %}
+            <div class="task-card" style="margin-bottom:0.3rem;">
+              <div class="task-title">{{ t.title }}</div>
+              {% if t.description %}
+                <div style="font-size:0.78rem; color:var(--text-muted); margin-top:0.15rem;">
+                  {{ t.description }}
+                </div>
+              {% endif %}
+              <div class="task-meta">
+                <div style="display:flex; gap:0.3rem; flex-wrap:wrap;">
+                  {% if t.creator_stage %}
+                    <span class="pill pill-medium">{{ t.creator_stage }}</span>
+                  {% endif %}
+                  {% if t.platform %}
+                    <span class="pill" style="background:rgba(59,130,246,0.12); border-color:rgba(59,130,246,0.7); color:#bfdbfe;">
+                      {{ t.platform }}
+                    </span>
+                  {% endif %}
+                </div>
+                <div class="muted" style="font-size:0.75rem;">
+                  {% if t.project %}Projet : {{ t.project.name }}{% endif %}
+                </div>
+              </div>
+              <div class="task-actions" style="margin-top:0.4rem;">
+                <a href="{{ url_for('main.edit_task', task_id=t.id) }}">
+                  <button type="button" class="btn btn-secondary" style="font-size:0.75rem;">Fixer une date</button>
+                </a>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="muted">Aucun contenu sans date. Tu es à jour sur ton planning 👌</p>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+{% endblock %}

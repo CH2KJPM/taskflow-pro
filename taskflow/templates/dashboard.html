@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  <!-- CSS local du switch de vues -->
+  <style>
+    .view-toggle-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.15rem;
+      padding: 0.2rem;
+      border-radius: 9999px;
+      background: rgba(15, 23, 42, 0.98);
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.85);
+    }
+
+    .view-toggle-link {
+      text-decoration: none;
+    }
+
+    .view-toggle-btn {
+      display: block;
+      padding: 0.35rem 1.1rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      white-space: nowrap;
+      transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .view-toggle-btn:hover {
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+    }
+
+    .view-toggle-btn-active {
+      background: linear-gradient(90deg, #2563eb, #4f46e5);
+      color: #ffffff;
+      box-shadow:
+        0 0 0 1px rgba(191, 219, 254, 0.35),
+        0 12px 30px rgba(37, 99, 235, 0.45);
+    }
+  </style>
+
+  <!-- HEADER / HERO -->
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; margin-bottom:1.5rem;">
+    <div>
+      <h1 class="page-title">Dashboard</h1>
+      {% if current_user.is_creator %}
+        <p class="page-subtitle">
+          Mode créateur activé — vue globale de tes projets et contenus.
+        </p>
+      {% else %}
+        <p class="page-subtitle">
+          Vue d’ensemble de tes projets, tâches et priorités.
+        </p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- STATS TOP -->
+  <div class="card-soft" style="margin-bottom:1.5rem;">
+    <div style="display:flex; flex-wrap:wrap; gap:1rem; justify-content:space-between; align-items:center;">
+      <div style="display:flex; flex-wrap:wrap; gap:0.75rem;">
+
+        <div class="card-soft" style="min-width:160px; padding:0.9rem 1rem;">
+          <div class="muted" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em;">
+            Projets
+          </div>
+          <div style="font-size:1.4rem; font-weight:600; margin-top:0.15rem;">
+            {{ total_projects }}
+          </div>
+          <div class="muted" style="font-size:0.8rem; margin-top:0.1rem;">
+            actifs
+          </div>
+        </div>
+
+        <div class="card-soft" style="min-width:160px; padding:0.9rem 1rem;">
+          <div class="muted" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em;">
+            Tâches ouvertes
+          </div>
+          <div style="font-size:1.4rem; font-weight:600; margin-top:0.15rem;">
+            {{ total_tasks_open }}
+          </div>
+          <div class="muted" style="font-size:0.8rem; margin-top:0.1rem;">
+            à traiter
+          </div>
+        </div>
+
+        <div class="card-soft" style="min-width:160px; padding:0.9rem 1rem;">
+          <div class="muted" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em;">
+            Tâches générales
+          </div>
+          <div style="font-size:1.4rem; font-weight:600; margin-top:0.15rem;">
+            {{ total_general_open }}
+          </div>
+          <div class="muted" style="font-size:0.8rem; margin-top:0.1rem;">
+            non terminées
+          </div>
+        </div>
+
+        <div class="card-soft" style="min-width:160px; padding:0.9rem 1rem;">
+          <div class="muted" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em;">
+            Contenus
+          </div>
+          <div style="font-size:1.4rem; font-weight:600; margin-top:0.15rem;">
+            {{ total_content_open }}
+          </div>
+          <div class="muted" style="font-size:0.8rem; margin-top:0.1rem;">
+            en cours / à venir
+          </div>
+        </div>
+      </div>
+
+            <div style="text-align:right; font-size:0.8rem; color:var(--text-muted); max-width:280px;">
+        <div style="margin-bottom:0.35rem;">
+          {% if todays_contents > 0 %}
+            Aujourd’hui ({{ today.strftime("%d.%m.%Y") }}), tu as
+            <strong>{{ todays_contents }}</strong> contenu{{ 's' if todays_contents > 1 }}
+            planifié{{ 's' if todays_contents > 1 }} 🎯
+          {% else %}
+            Aucun contenu planifié aujourd’hui.
+            {% if current_user.is_creator %}
+              Pense à en ajouter un dans ton espace créateur 📆
+            {% endif %}
+          {% endif %}
+        </div>
+
+        <div>
+          Cette semaine :
+          <strong>{{ tasks_done_week }}</strong>
+          tâche{{ 's' if tasks_done_week != 1 }} terminée{{ 's' if tasks_done_week != 1 }}<br>
+          Ce mois-ci :
+          <strong>{{ tasks_done_month }}</strong>
+          tâche{{ 's' if tasks_done_month != 1 }} terminée{{ 's' if tasks_done_month != 1 }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ZONE CRÉATEUR SPECIFIQUE -->
+  {% if current_user.is_creator %}
+    <div class="card-soft" style="margin-bottom:1.5rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+        <div>
+          <h2 style="font-size:1.05rem; margin:0;">Vue rapide contenus</h2>
+          <p class="muted" style="font-size:0.8rem; margin-top:0.2rem;">
+            Résumé de ton pipeline de création.
+          </p>
+        </div>
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+          <span class="pill" style="background:rgba(239,68,68,0.12); border-color:rgba(239,68,68,0.7); color:#fecaca;">
+            {{ contents_to_film }} à filmer
+          </span>
+          <span class="pill" style="background:rgba(234,179,8,0.12); border-color:rgba(234,179,8,0.8); color:#facc15;">
+            {{ contents_to_edit }} à monter
+          </span>
+          <span class="pill" style="background:rgba(16,185,129,0.12); border-color:rgba(16,185,129,0.8); color:#6ee7b7;">
+            {{ contents_scheduled }} programmé{{ 's' if contents_scheduled != 1 }}
+          </span>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- LISTE DES PROJETS -->
+  <div class="card-soft">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem;">
+      <h2 style="font-size:1.05rem; margin:0;">Mes projets</h2>
+      <a href="{{ url_for('main.create_project') }}">
+        <button class="btn btn-primary" style="font-size:0.85rem;">+ Nouveau projet</button>
+      </a>
+    </div>
+
+    {% if projects %}
+      <div class="projects-grid">
+        {% for p in projects %}
+          {% set open_tasks = p.tasks | selectattr("status", "ne", "done") | list %}
+          <div class="project-card">
+            <div class="project-card-title">{{ p.name }}</div>
+            <div class="project-card-desc">
+              {% if p.description %}
+                {{ p.description }}
+              {% else %}
+                Pas encore de description pour ce projet.
+              {% endif %}
+            </div>
+            <div class="project-card-footer">
+              <span>
+                {{ open_tasks|length }} tâche{{ 's' if open_tasks|length != 1 }} ouverte{{ 's' if open_tasks|length != 1 }}
+              </span>
+              <a href="{{ url_for('main.project_detail', project_id=p.id) }}">
+                <button class="btn btn-secondary" style="font-size:0.8rem;">Ouvrir le projet →</button>
+              </a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="muted">
+        Aucun projet pour l’instant. Commence par en créer un pour organiser tes tâches.
+      </p>
+    {% endif %}
+  </div>
+{% endblock %}

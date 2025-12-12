@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div style="max-width:720px; margin:0 auto;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; margin-bottom:1.5rem;">
+      <div>
+        <h1 class="page-title">Nouveau contenu</h1>
+        <p class="page-subtitle">
+          Crée une idée, une vidéo à filmer ou un contenu à monter en quelques secondes.
+        </p>
+      </div>
+      <div style="display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:flex-end;">
+        <a href="{{ url_for('main.creator_dashboard') }}">
+          <button class="btn btn-secondary">← Espace créateur</button>
+        </a>
+      </div>
+    </div>
+
+    <div class="card-soft">
+      <form method="post">
+        <!-- Titre -->
+        <div class="field">
+          <label for="title">Titre du contenu *</label>
+          <input id="title" name="title" type="text" required
+                 class="input"
+                 placeholder="Ex : 3 tips pour débuter sur TikTok">
+        </div>
+
+        <!-- Description -->
+        <div class="field">
+          <label for="description">Description / script (optionnel)</label>
+          <textarea id="description" name="description" class="textarea"
+                    placeholder="Notes, script, accroche, CTA…"></textarea>
+        </div>
+
+        <!-- Ligne projets / plateforme -->
+        <div style="display:flex; flex-wrap:wrap; gap:0.8rem;">
+          <div class="field" style="flex:1 1 200px;">
+            <label for="project_id">Projet *</label>
+            <select id="project_id" name="project_id" class="select" required>
+              <option value="">Choisir un projet…</option>
+              {% for p in projects %}
+                <option value="{{ p.id }}">{{ p.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="field" style="flex:1 1 200px;">
+            <label for="platform">Plateforme principale</label>
+            <select id="platform" name="platform" class="select">
+              <option value="">Non défini / multi</option>
+              <option value="tiktok">TikTok</option>
+              <option value="instagram">Instagram</option>
+              <option value="youtube">YouTube</option>
+              <option value="other">Autre / Multi</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Ligne étape / priorité -->
+        <div style="display:flex; flex-wrap:wrap; gap:0.8rem;">
+          <div class="field" style="flex:1 1 200px;">
+            <label for="creator_stage">Étape du contenu</label>
+            <select id="creator_stage" name="creator_stage" class="select">
+              <option value="idea">Idée</option>
+              <option value="to_film">À filmer</option>
+              <option value="to_edit">À monter</option>
+              <option value="scheduled">Programmé</option>
+              <option value="published">Publié</option>
+            </select>
+          </div>
+
+          <div class="field" style="flex:1 1 200px;">
+            <label for="priority">Priorité</label>
+            <select id="priority" name="priority" class="select">
+              <option value="low">Basse</option>
+              <option value="medium" selected>Moyenne</option>
+              <option value="high">Haute</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Date -->
+        <div class="field" style="max-width:220px;">
+          <label for="due_date">Date cible (optionnel)</label>
+          <input id="due_date" name="due_date" type="date" class="input">
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:0.6rem; margin-top:1rem;">
+          <a href="{{ url_for('main.creator_dashboard') }}">
+            <button type="button" class="btn btn-secondary">Annuler</button>
+          </a>
+          <button type="submit" class="btn btn-primary">
+            Créer le contenu
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

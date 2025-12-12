@@ -1,0 +1,68 @@
+<div class="card-soft" style="padding:1rem; display:flex; flex-direction:column; gap:0.9rem;">
+
+  <!-- Header -->
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.75rem;">
+    <div style="min-width:0;">
+      <div style="font-weight:650; font-size:1.05rem; line-height:1.2;">
+        {{ task.title }}
+      </div>
+      <div class="muted" style="font-size:0.75rem; margin-top:0.1rem;">
+        Projet · {{ task.project.name }}
+      </div>
+    </div>
+
+    <!-- Priorité -->
+    <span class="pill pill-{{ task.priority }}">
+      {{ task.priority }}
+    </span>
+  </div>
+
+  <!-- Description -->
+  <div>
+    <label>Description</label>
+    <div class="muted" style="white-space:pre-wrap; font-size:0.85rem;">
+      {{ task.description or "—" }}
+    </div>
+  </div>
+
+  <!-- Meta infos -->
+  <div style="display:flex; flex-wrap:wrap; gap:0.35rem;">
+    <span class="pill pill-medium">Statut · {{ task.status }}</span>
+    <span class="pill pill-medium">Type · {{ task.task_type }}</span>
+
+    {% if task.creator_stage %}
+      <span class="pill pill-medium">Étape · {{ task.creator_stage }}</span>
+    {% endif %}
+
+    {% if task.platform %}
+      <span class="pill pill-medium">Plateforme · {{ task.platform }}</span>
+    {% endif %}
+
+    {% if task.due_date %}
+      <span class="pill pill-medium">
+        Échéance · {{ task.due_date.strftime("%d.%m.%Y") }}
+      </span>
+    {% endif %}
+  </div>
+
+  <!-- Actions -->
+  <div style="
+    display:flex;
+    flex-direction:column;
+    gap:0.4rem;
+    margin-top:0.4rem;
+  ">
+    <a href="{{ url_for('main.task_detail', task_id=task.id) }}"
+       class="btn btn-primary"
+       style="width:100%; text-align:center;">
+      Ouvrir la tâche
+    </a>
+
+    <a href="{{ url_for('main.edit_task', task_id=task.id) }}"
+       class="btn btn-secondary"
+       style="width:100%; text-align:center;">
+      Modifier
+    </a>
+  </div>
+
+</div>

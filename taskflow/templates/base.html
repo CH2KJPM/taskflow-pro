@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>TaskFlow Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    :root{
+      --bg:#020617;
+      --bg-elevated:#0b1120;
+      --bg-card:#020617;
+      --border-subtle:rgba(31,41,55,0.9);
+      --accent:#3b82f6;
+      --accent-soft:rgba(59,130,246,0.15);
+      --text:#e5e7eb;
+      --text-muted:#9ca3af;
+      --danger:#ef4444;
+      --danger-soft:rgba(239,68,68,0.12);
+      --success:#22c55e;
+      --success-soft:rgba(34,197,94,0.12);
+      --radius-lg:14px;
+      --radius-md:10px;
+      --shadow-soft:0 18px 45px rgba(15,23,42,0.7);
+    }
+
+    *{ box-sizing:border-box; }
+
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:radial-gradient(circle at top,#111827 0,#020617 55%,#000 100%);
+      color:var(--text);
+      min-height:100vh;
+    }
+
+    a{ color:var(--accent); text-decoration:none; }
+    a:hover{ text-decoration:underline; }
+
+    .layout{
+      max-width:1100px;
+      margin:2rem auto 3rem;
+      padding:0 1.5rem;
+    }
+
+    /* === TYPO === */
+    .page-title{
+      font-size:2rem;
+      font-weight:650;
+      letter-spacing:.02em;
+      margin:0 0 .3rem;
+    }
+    .page-subtitle{
+      margin:0;
+      font-size:.95rem;
+      color:var(--text-muted);
+    }
+    .muted{ color:var(--text-muted); font-size:.85rem; }
+
+    /* === CARDS === */
+    .card{
+      background:radial-gradient(circle at top left,rgba(59,130,246,0.06),transparent 55%) var(--bg-card);
+      border-radius:var(--radius-lg);
+      padding:1.5rem 1.75rem;
+      border:1px solid var(--border-subtle);
+      box-shadow:var(--shadow-soft);
+    }
+    .card-soft{
+      background:rgba(15,23,42,0.95);
+      border-radius:var(--radius-lg);
+      padding:1.4rem 1.5rem;
+      border:1px solid rgba(31,41,55,0.8);
+    }
+
+    /* === BUTTONS === */
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:.4rem .9rem;
+      border-radius:999px;
+      border:1px solid transparent;
+      font-size:.9rem;
+      cursor:pointer;
+      background:transparent;
+      color:var(--text);
+      transition:all .15s ease;
+      gap:.3rem;
+      white-space:nowrap;
+    }
+    .btn-primary{
+      background:linear-gradient(135deg,#2563eb,#4f46e5);
+      border-color:rgba(59,130,246,0.7);
+      box-shadow:0 14px 30px rgba(37,99,235,0.45);
+    }
+    .btn-primary:hover{
+      transform:translateY(-1px);
+      box-shadow:0 18px 40px rgba(37,99,235,0.7);
+    }
+    .btn-secondary{
+      border-color:rgba(148,163,184,0.7);
+      background:rgba(15,23,42,0.9);
+    }
+    .btn-secondary:hover{ background:rgba(30,64,175,0.3); }
+
+    .btn-danger{
+      border-color:rgba(248,113,113,0.7);
+      background:var(--danger-soft);
+      color:#fecaca;
+    }
+    .btn-danger:hover{ background:rgba(248,113,113,0.15); }
+
+    /* === INPUTS === */
+    .input,.textarea,.select{
+      width:100%;
+      padding:.55rem .7rem;
+      border-radius:var(--radius-md);
+      border:1px solid rgba(55,65,81,0.9);
+      background:rgba(15,23,42,0.95);
+      color:var(--text);
+      font-size:.9rem;
+      outline:none;
+      transition:border-color .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+    .input:focus,.textarea:focus,.select:focus{
+      border-color:var(--accent);
+      box-shadow:0 0 0 1px rgba(59,130,246,0.5);
+      background:rgba(15,23,42,1);
+    }
+    .textarea{ min-height:80px; resize:vertical; }
+
+    label{
+      font-size:.85rem;
+      color:var(--text-muted);
+      display:block;
+      margin-bottom:.15rem;
+    }
+    .field{ margin-bottom:.85rem; }
+
+    /* === PILLS === */
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      font-size:.7rem;
+      padding:.15rem .5rem;
+      border-radius:999px;
+      border:1px solid transparent;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+    }
+    .pill-low{ background:rgba(34,197,94,0.1); border-color:rgba(34,197,94,0.5); color:#bbf7d0; }
+    .pill-medium{ background:rgba(59,130,246,0.12); border-color:rgba(59,130,246,0.6); color:#bfdbfe; }
+    .pill-high{ background:rgba(248,113,113,0.12); border-color:rgba(248,113,113,0.75); color:#fecaca; }
+
+    /* === PROJECTS GRID (si utilisé) === */
+    .projects-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+      gap:1rem;
+      margin-top:1.5rem;
+    }
+    .project-card{
+      background:rgba(15,23,42,0.96);
+      border-radius:var(--radius-lg);
+      border:1px solid rgba(31,41,55,0.9);
+      padding:1.1rem 1.2rem;
+      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+    }
+    .project-card:hover{
+      transform:translateY(-2px);
+      border-color:rgba(59,130,246,0.7);
+      box-shadow:0 16px 35px rgba(15,23,42,0.9);
+    }
+    .project-card-title{ font-size:1.05rem; margin-bottom:.25rem; }
+    .project-card-desc{ font-size:.8rem; color:var(--text-muted); margin-bottom:.6rem; min-height:1.2rem; }
+    .project-card-footer{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      font-size:.75rem;
+      color:var(--text-muted);
+    }
+
+    /* ===========================
+       HEADER (DESKTOP)
+       =========================== */
+    .app-header{
+      position:sticky;
+      top:0;
+      z-index:999;
+      backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
+      background:
+        radial-gradient(circle at top left, rgba(59,130,246,0.18), transparent 55%),
+        rgba(10,16,32,0.96);
+      border-bottom:1px solid rgba(15,23,42,0.9);
+      transition:background .25s ease;
+    }
+    .app-header.scrolled{
+      background:
+        radial-gradient(circle at top left, rgba(59,130,246,0.14), transparent 55%),
+        rgba(10,16,32,0.98);
+    }
+    .app-header-inner{
+      max-width:1120px;
+      margin:0 auto;
+      padding:.55rem 1.5rem;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:1.25rem;
+    }
+
+    /* Brand */
+    .app-brand{
+      display:flex;
+      align-items:center;
+      gap:.6rem;
+      text-decoration:none;
+      color:var(--text);
+    }
+    .app-brand:hover{ text-decoration:none; }
+
+    .app-brand-logo{
+      width:32px; height:32px;
+      border-radius:999px;
+      background:radial-gradient(circle at 30% 0%, #60a5fa, #1d4ed8);
+      display:flex; align-items:center; justify-content:center;
+      font-size:.85rem;
+      font-weight:700;
+      color:white;
+      box-shadow:0 0 0 1px rgba(15,23,42,0.7), 0 10px 30px rgba(15,118,255,0.35);
+      flex:0 0 auto;
+    }
+    .app-brand-text{ display:flex; flex-direction:column; gap:.1rem; }
+    .app-brand-name{ font-size:.9rem; font-weight:650; }
+    .app-brand-badge{
+      font-size:.65rem;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      padding:.05rem .45rem;
+      border-radius:999px;
+      border:1px solid rgba(96,165,250,0.6);
+      color:#bfdbfe;
+      width:fit-content;
+    }
+
+    /* Nav links (desktop) */
+    .app-nav-links{
+      display:flex;
+      align-items:center;
+      gap:.6rem;
+      flex:1;
+      justify-content:center;
+    }
+    .app-nav-link{
+      font-size:.82rem;
+      padding:.35rem .8rem;
+      border-radius:999px;
+      text-decoration:none;
+      color:var(--text-muted);
+      border:1px solid transparent;
+    }
+    .app-nav-link:hover{
+      background:rgba(15,23,42,0.9);
+      border-color:rgba(55,65,81,0.9);
+      color:#e5e7eb;
+      text-decoration:none;
+    }
+    .app-nav-link.is-active{
+      background:linear-gradient(135deg,#2563eb,#4f46e5);
+      color:white;
+      border-color:transparent;
+      box-shadow:0 8px 22px rgba(37,99,235,0.45);
+    }
+
+    /* Right zone (desktop) */
+    .app-header-right{
+      display:flex;
+      align-items:center;
+      gap:.7rem;
+    }
+
+    /* Search (desktop) */
+    .app-search{
+      position:relative;
+      display:flex;
+      align-items:center;
+      border-radius:999px;
+      background:rgba(15,23,42,0.92);
+      border:1px solid rgba(148,163,184,0.45);
+      padding:.15rem .6rem;
+    }
+    .app-search input{
+      background:transparent;
+      border:none;
+      outline:none;
+      font-size:.8rem;
+      padding:.25rem .25rem .25rem 1.1rem;
+      color:#e5e7eb;
+      width:150px;
+    }
+    .app-search input::placeholder{ color:rgba(148,163,184,0.9); }
+    .app-search-icon{
+      position:absolute;
+      left:.55rem;
+      font-size:.7rem;
+      opacity:.8;
+    }
+
+    /* User */
+    .app-user{ display:flex; align-items:center; gap:.35rem; }
+    .app-user-pill{
+      width:30px; height:30px;
+      border-radius:999px;
+      background:radial-gradient(circle at 30% 0%, #22d3ee, #6366f1);
+      display:flex; align-items:center; justify-content:center;
+      font-size:.8rem;
+      font-weight:700;
+      color:white;
+      text-decoration:none;
+    }
+    .app-user-pill:hover{ text-decoration:none; }
+    .app-logout-icon{
+      font-size:.9rem;
+      text-decoration:none;
+      color:rgba(148,163,184,0.9);
+    }
+    .app-logout-icon:hover{ color:#fca5a5; text-decoration:none; }
+
+    /* ===========================
+       MOBILE: logo + burger + drawer
+       =========================== */
+    .burger-btn{ display:none; }
+
+    @media (max-width:768px){
+      .layout{ padding:0 .9rem; margin:1.2rem auto 2rem; }
+
+      .app-header-inner{
+        padding:.55rem .9rem;
+        flex-direction:row;
+        align-items:center;
+        justify-content:space-between;
+        gap:.75rem;
+      }
+
+      .app-nav-links,
+      .app-header-right{
+        display:none !important;
+      }
+
+      .burger-btn{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        width:40px;
+        height:40px;
+        border-radius:12px;
+        background:rgba(15,23,42,0.8);
+        border:1px solid rgba(31,41,55,0.85);
+        color:#e5e7eb;
+        cursor:pointer;
+        font-size:1.1rem;
+      }
+
+      .card,.card-soft{ padding:1rem 1rem; }
+      .btn{ font-size:.8rem; padding:.35rem .7rem; }
+      .input,.textarea,.select{ font-size:.85rem; padding:.5rem .6rem; }
+      .projects-grid{ grid-template-columns:minmax(0,1fr); }
+    }
+
+    /* Drawer */
+    .drawer-backdrop{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.55);
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .18s ease;
+      z-index:60;
+    }
+
+    .drawer{
+      position:fixed;
+      top:0;
+      right:0;
+      width:min(86vw,340px);
+      height:100vh;
+      background:rgba(10,16,32,0.98);
+      border-left:1px solid rgba(31,41,55,0.9);
+      transform:translateX(100%);
+      transition:transform .18s ease;
+      z-index:61;
+      padding:.9rem;
+      display:flex;
+      flex-direction:column;
+      gap:.9rem;
+      box-shadow:-18px 0 50px rgba(0,0,0,0.45);
+    }
+
+    .drawer.open{ transform:translateX(0); }
+    .drawer-backdrop.open{ opacity:1; pointer-events:auto; }
+
+    .drawer-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .drawer-title{
+      font-weight:650;
+      letter-spacing:.02em;
+    }
+    .drawer-close{
+      width:36px; height:36px;
+      border-radius:12px;
+      border:1px solid rgba(55,65,81,0.9);
+      background:rgba(15,23,42,0.92);
+      color:#e5e7eb;
+      cursor:pointer;
+    }
+
+    .drawer-user{
+      display:flex;
+      align-items:center;
+      gap:.65rem;
+      padding:.75rem;
+      border-radius:14px;
+      border:1px solid rgba(31,41,55,0.9);
+      background:rgba(15,23,42,0.7);
+    }
+    .drawer-user-pill{
+      width:38px; height:38px;
+      border-radius:999px;
+      display:flex; align-items:center; justify-content:center;
+      background:radial-gradient(circle at 30% 0%, #22d3ee, #6366f1);
+      font-weight:800;
+      color:white;
+      flex:0 0 auto;
+    }
+    .drawer-user-name{ font-weight:650; }
+    .drawer-user-sub{ font-size:.78rem; color:rgba(148,163,184,0.9); }
+
+    .drawer-links{
+      display:flex;
+      flex-direction:column;
+      gap:.35rem;
+    }
+    .drawer-link{
+      padding:.65rem .75rem;
+      border-radius:12px;
+      border:1px solid rgba(31,41,55,0.9);
+      background:rgba(15,23,42,0.55);
+      color:#e5e7eb;
+      text-decoration:none;
+    }
+    .drawer-link:hover{
+      background:rgba(37,99,235,0.18);
+      border-color:rgba(59,130,246,0.55);
+      text-decoration:none;
+    }
+    .drawer-link.is-active{
+      background:rgba(37,99,235,0.22);
+      border-color:rgba(59,130,246,0.65);
+    }
+
+    .drawer-actions{
+      margin-top:auto;
+      padding-top:.75rem;
+      border-top:1px solid rgba(31,41,55,0.8);
+    }
+    .drawer-logout{
+      display:block;
+      padding:.65rem .75rem;
+      border-radius:12px;
+      border:1px solid rgba(248,113,113,0.35);
+      background:rgba(239,68,68,0.10);
+      color:#fecaca;
+      text-decoration:none;
+    }
+    .drawer-logout:hover{
+      background:rgba(239,68,68,0.16);
+      text-decoration:none;
+    }
+
+    /* Toast colors */
+    .toast-success{ background:var(--success-soft) !important; border-color:rgba(34,197,94,0.7) !important; }
+    .toast-error{ background:var(--danger-soft) !important; border-color:rgba(248,113,113,0.8) !important; }
+    .toast-info{ background:rgba(59,130,246,0.15) !important; border-color:rgba(59,130,246,0.7) !important; }
+
+    /* ✅ Actions de page : propre desktop + mobile */
+    .page-actions{
+      display:flex;
+      flex-direction:column;
+      gap:0.4rem;
+      align-items:flex-end;
+    }
+
+    @media (max-width:768px){
+      .page-actions{
+        align-items:stretch;
+        width:100%;
+      }
+      .page-actions .btn{
+        width:100%;
+        justify-content:center;
+      }
+    }
+
+    .page-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:1rem;
+      margin-bottom:1.25rem;
+    }
+
+    .page-header-text{ min-width: 0; }
+
+    .page-actions-row{
+      display:flex;
+      gap:0.4rem;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    @media (max-width:768px){
+      .page-header{ flex-direction:column; }
+      .page-actions{ width:100%; align-items:stretch; }
+      .page-actions-row{ justify-content:stretch; }
+      .page-actions-row .btn{
+        flex: 1 1 auto;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header class="app-header">
+  <div class="app-header-inner">
+
+    <a href="{{ url_for('main.dashboard') }}" class="app-brand" aria-label="Aller au dashboard">
+      <div class="app-brand-logo">TF</div>
+      <div class="app-brand-text">
+        <span class="app-brand-name">TaskFlow</span>
+        <span class="app-brand-badge">BÊTA</span>
+      </div>
+    </a>
+
+    <!-- Desktop nav -->
+    <nav class="app-nav-links">
+      {% if current_user.is_authenticated %}
+        <a href="{{ url_for('main.dashboard') }}"
+           class="app-nav-link {% if request.endpoint == 'main.dashboard' %}is-active{% endif %}">
+          Dashboard
+        </a>
+        <a href="{{ url_for('main.today') }}"
+           class="app-nav-link {% if request.endpoint == 'main.today' %}is-active{% endif %}">
+          Aujourd’hui
+        </a>
+        <a href="{{ url_for('main.calendar_view') }}"
+           class="app-nav-link {% if request.endpoint == 'main.calendar_view' %}is-active{% endif %}">
+          Calendrier
+        </a>
+        <a href="{{ url_for('main.analytics') }}"
+           class="app-nav-link {% if request.endpoint == 'main.analytics' %}is-active{% endif %}">
+          Analytics
+        </a>
+        {% if current_user.is_creator %}
+          <a href="{{ url_for('main.creator_dashboard') }}"
+             class="app-nav-link {% if request.endpoint == 'main.creator_dashboard' %}is-active{% endif %}">
+            Créateur
+          </a>
+        {% endif %}
+      {% else %}
+        <a href="{{ url_for('main.home') }}"
+           class="app-nav-link {% if request.endpoint == 'main.home' %}is-active{% endif %}">
+          Accueil
+        </a>
+        <a href="{{ url_for('main.pricing') }}" class="app-nav-link">Tarifs</a>
+      {% endif %}
+    </nav>
+
+    <!-- Right zone desktop -->
+    <div class="app-header-right">
+      {% if current_user.is_authenticated %}
+        <form method="get" action="{{ url_for('main.search') }}" class="app-search" role="search">
+          <span class="app-search-icon">🔍</span>
+          <input type="text" name="q" placeholder="Rechercher…" autocomplete="off">
+        </form>
+
+        <div class="app-user">
+          <a href="{{ url_for('main.profile') }}" class="app-user-pill" title="Profil">
+            {{ current_user.name[:2] | upper }}
+          </a>
+          <a href="{{ url_for('auth.logout') }}" class="app-logout-icon" title="Se déconnecter">⏻</a>
+        </div>
+      {% else %}
+        <div class="app-auth-links">
+          <a href="{{ url_for('auth.login') }}" class="app-nav-link">Connexion</a>
+          <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-small">Inscription</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Mobile burger -->
+    <button class="burger-btn" id="burgerBtn" aria-label="Ouvrir le menu" aria-expanded="false">
+      ☰
+    </button>
+
+  </div>
+</header>
+
+<!-- Mobile drawer -->
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+
+<aside class="drawer" id="drawer" aria-label="Menu mobile">
+  <div class="drawer-top">
+    <div class="drawer-title">Menu</div>
+    <button class="drawer-close" id="drawerClose" aria-label="Fermer">✕</button>
+  </div>
+
+  {% if current_user.is_authenticated %}
+    <div class="drawer-user">
+      <div class="drawer-user-pill">{{ current_user.name[:2] | upper }}</div>
+      <div>
+        <div class="drawer-user-name">{{ current_user.name }}</div>
+        <div class="drawer-user-sub">Connecté</div>
+      </div>
+    </div>
+
+    <nav class="drawer-links">
+      <a href="{{ url_for('main.dashboard') }}" class="drawer-link {% if request.endpoint == 'main.dashboard' %}is-active{% endif %}">Dashboard</a>
+      <a href="{{ url_for('main.today') }}" class="drawer-link {% if request.endpoint == 'main.today' %}is-active{% endif %}">Aujourd’hui</a>
+      <a href="{{ url_for('main.calendar_view', view='week') }}" class="drawer-link {% if request.endpoint == 'main.calendar_view' %}is-active{% endif %}">Calendrier</a>
+      <a href="{{ url_for('main.analytics') }}" class="drawer-link {% if request.endpoint == 'main.analytics' %}is-active{% endif %}">Analytics</a>
+      {% if current_user.is_creator %}
+        <a href="{{ url_for('main.creator_dashboard') }}" class="drawer-link {% if request.endpoint == 'main.creator_dashboard' %}is-active{% endif %}">Créateur</a>
+      {% endif %}
+      <a href="{{ url_for('main.profile') }}" class="drawer-link {% if request.endpoint == 'main.profile' %}is-active{% endif %}">Profil</a>
+    </nav>
+
+    <div class="drawer-actions">
+      <a class="drawer-logout" href="{{ url_for('auth.logout') }}">⏻ Se déconnecter</a>
+    </div>
+  {% else %}
+    <nav class="drawer-links">
+      <a href="{{ url_for('main.home') }}" class="drawer-link {% if request.endpoint == 'main.home' %}is-active{% endif %}">Accueil</a>
+      <a href="{{ url_for('main.pricing') }}" class="drawer-link {% if request.endpoint == 'main.pricing' %}is-active{% endif %}">Tarifs</a>
+      <a href="{{ url_for('auth.login') }}" class="drawer-link {% if request.endpoint == 'auth.login' %}is-active{% endif %}">Connexion</a>
+      <a href="{{ url_for('auth.register') }}" class="drawer-link {% if request.endpoint == 'auth.register' %}is-active{% endif %}">Inscription</a>
+    </nav>
+  {% endif %}
+</aside>
+
+<main class="layout">
+
+  <!-- Toasts -->
+  <div id="toast-container"
+       style="position:fixed; top:1rem; right:1rem; z-index:50; display:flex; flex-direction:column; gap:0.5rem;">
+    {% with messages = get_flashed_messages(with_categories=True) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="toast toast-{{ category }}"
+               style="
+                 min-width:220px;
+                 max-width:320px;
+                 padding:0.6rem 0.9rem;
+                 border-radius:12px;
+                 border:1px solid rgba(148,163,184,0.5);
+                 background: rgba(15,23,42,0.95);
+                 color: var(--text);
+                 font-size:0.8rem;
+                 box-shadow: 0 14px 40px rgba(15,23,42,0.9);
+                 display:flex;
+                 align-items:flex-start;
+                 justify-content:space-between;
+                 gap:0.5rem;
+                 opacity:1;
+                 transform:translateX(0);
+                 transition: opacity 0.25s ease, transform 0.25s ease;">
+            <span>{{ message }}</span>
+            <button onclick="this.parentElement.style.opacity='0'; this.parentElement.style.transform='translateX(10px)'; setTimeout(()=>this.parentElement.remove(),200);"
+                    style="border:none; background:transparent; color:var(--text-muted); cursor:pointer; font-size:0.8rem;">
+              ✕
+            </button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  {% block content %}{% endblock %}
+</main>
+
+<script>
+  // Toast auto-hide
+  window.addEventListener("load", () => {
+    const toasts = document.querySelectorAll("#toast-container .toast");
+    toasts.forEach((toast, index) => {
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translateX(10px)";
+        setTimeout(() => toast.remove(), 250);
+      }, 3500 + index * 300);
+    });
+  });
+</script>
+
+<script>
+  // Header scrolled
+  document.addEventListener("scroll", () => {
+    const header = document.querySelector(".app-header");
+    if (!header) return;
+    if (window.scrollY > 20) header.classList.add("scrolled");
+    else header.classList.remove("scrolled");
+  });
+</script>
+
+<script>
+  // Burger + drawer (safe)
+  document.addEventListener("DOMContentLoaded", () => {
+    const burgerBtn = document.getElementById("burgerBtn");
+    const drawer = document.getElementById("drawer");
+    const backdrop = document.getElementById("drawerBackdrop");
+    const closeBtn = document.getElementById("drawerClose");
+
+    if (!burgerBtn || !drawer || !backdrop || !closeBtn) {
+      console.warn("Burger menu: élément manquant", { burgerBtn, drawer, backdrop, closeBtn });
+      return;
+    }
+
+    function openDrawer(){
+      drawer.classList.add("open");
+      backdrop.classList.add("open");
+      burgerBtn.setAttribute("aria-expanded", "true");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeDrawer(){
+      drawer.classList.remove("open");
+      backdrop.classList.remove("open");
+      burgerBtn.setAttribute("aria-expanded", "false");
+      document.body.style.overflow = "";
+    }
+
+    burgerBtn.addEventListener("click", openDrawer);
+    closeBtn.addEventListener("click", closeDrawer);
+    backdrop.addEventListener("click", closeDrawer);
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeDrawer();
+    });
+  });
+</script>
+
+<!-- ===== Task Drawer (global) ===== -->
+<div id="taskDrawerBackdrop" style="
+  position:fixed; inset:0; z-index:2000;
+  background: rgba(0,0,0,0.55);
+  opacity:0; pointer-events:none;
+  transition: opacity .18s ease;"></div>
+
+<aside id="taskDrawer" style="
+  position:fixed; top:0; right:0; z-index:2001;
+  width:min(92vw, 420px); height:100vh;
+  background: rgba(10,16,32,0.98);
+  border-left:1px solid rgba(31,41,55,0.9);
+  transform: translateX(105%);
+  transition: transform .18s ease;
+  padding: 0.9rem;
+  box-shadow:-18px 0 55px rgba(0,0,0,0.45);
+  display:flex; flex-direction:column; gap:0.75rem;"
+  aria-hidden="true">
+
+  <div style="display:flex; align-items:center; justify-content:space-between; gap:0.75rem;">
+    <div style="font-weight:650; letter-spacing:0.02em;">Détail tâche</div>
+    <button id="taskDrawerClose" class="btn btn-secondary" style="padding:0.25rem 0.6rem;">✕</button>
+  </div>
+
+  <div id="taskDrawerContent" style="opacity:0.95;">
+    <div class="muted">Chargement…</div>
+  </div>
+</aside>
+
+<script>
+(function(){
+  const drawer = document.getElementById("taskDrawer");
+  const backdrop = document.getElementById("taskDrawerBackdrop");
+  const closeBtn = document.getElementById("taskDrawerClose");
+  const content = document.getElementById("taskDrawerContent");
+
+  let __isDragging = false;
+
+  document.addEventListener("dragstart", (e)=>{
+    if(e.target.closest(".task-card[draggable='true']")) __isDragging = true;
+  });
+  document.addEventListener("dragend", ()=>{
+    setTimeout(()=>{ __isDragging = false; }, 60);
+  });
+
+  function openDrawer(html){
+    content.innerHTML = html;
+    drawer.style.transform = "translateX(0)";
+    backdrop.style.opacity = "1";
+    backdrop.style.pointerEvents = "auto";
+    drawer.setAttribute("aria-hidden","false");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeDrawer(){
+    drawer.style.transform = "translateX(105%)";
+    backdrop.style.opacity = "0";
+    backdrop.style.pointerEvents = "none";
+    drawer.setAttribute("aria-hidden","true");
+    document.body.style.overflow = "";
+  }
+
+  closeBtn.addEventListener("click", closeDrawer);
+  backdrop.addEventListener("click", closeDrawer);
+  document.addEventListener("keydown", (e)=>{ if(e.key==="Escape") closeDrawer(); });
+
+  async function loadTask(taskId){
+    openDrawer(`<div class="muted">Chargement…</div>`);
+
+    const res = await fetch(`/task/${taskId}/drawer`, {
+      headers: { "X-Requested-With": "XMLHttpRequest" }
+    });
+
+    if(!res.ok){
+      openDrawer(`<div class="muted">Erreur chargement (${res.status})</div>`);
+      return;
+    }
+
+    const html = await res.text();
+    openDrawer(html);
+  }
+
+  // ✅ CLICK TASK → OPEN DRAWER
+  document.addEventListener("click", (e)=>{
+    if(__isDragging) return; // 🔥 ICI
+    const el = e.target.closest(".js-task-open");
+    if(!el) return;
+    e.preventDefault();
+    const taskId = el.getAttribute("data-task-id");
+    if(taskId) loadTask(taskId);
+  });
+
+  window.__taskDrawerClose = closeDrawer;
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="card">
+    <h1 class="page-title">Nouveau projet</h1>
+    <p class="page-subtitle">
+      Donne un nom clair à ton projet, et une courte description pour te rappeler l’objectif.
+    </p>
+
+    <form method="post" style="max-width: 450px; margin-top: 1.3rem;">
+      <div class="field">
+        <label for="name">Nom du projet</label>
+        <input id="name" name="name" type="text" required class="input">
+      </div>
+
+      <div class="field">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" class="textarea"></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Créer le projet</button>
+    </form>
+  </div>
+{% endblock %}

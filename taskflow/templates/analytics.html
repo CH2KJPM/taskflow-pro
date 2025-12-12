@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <!-- HEADER -->
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; margin-bottom:1.5rem;">
+    <div>
+      <h1 class="page-title">Analytics</h1>
+      <p class="page-subtitle">
+        Vue d’ensemble de ton activité : tâches terminées et rythme sur les 12 derniers mois.
+      </p>
+    </div>
+    <div style="display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:flex-end;">
+      <a href="{{ url_for('main.dashboard') }}">
+        <button class="btn btn-secondary">Dashboard</button>
+      </a>
+      <a href="{{ url_for('main.today') }}">
+        <button class="btn btn-secondary">Aujourd’hui</button>
+      </a>
+      <a href="{{ url_for('main.calendar_view') }}">
+        <button class="btn btn-secondary">Calendrier</button>
+      </a>
+      {% if current_user.is_creator %}
+        <a href="{{ url_for('main.creator_dashboard') }}">
+          <button class="btn btn-secondary">Espace créateur 🎬</button>
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- STATS SEMAINE / MOIS -->
+  <div class="card-soft" style="margin-bottom:1.5rem;">
+    <div style="display:flex; flex-wrap:wrap; gap:1rem; justify-content:space-between; align-items:center;">
+      <div style="display:flex; flex-wrap:wrap; gap:0.75rem;">
+        <div class="card-soft" style="min-width:170px; padding:0.9rem 1rem;">
+          <div class="muted" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em;">
+            Cette semaine
+          </div>
+          <div style="font-size:1.4rem; font-weight:600; margin-top:0.15rem;">
+            {{ week_completed }}
+          </div>
+          <div class="muted" style="font-size:0.8rem; margin-top:0.1rem;">
+            tâche{{ 's' if week_completed != 1 }} terminée{{ 's' if week_completed != 1 }}
+          </div>
+        </div>
+
+        <div class="card-soft" style="min-width:170px; padding:0.9rem 1rem;">
+          <div class="muted" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em;">
+            Ce mois-ci
+          </div>
+          <div style="font-size:1.4rem; font-weight:600; margin-top:0.15rem;">
+            {{ month_completed }}
+          </div>
+          <div class="muted" style="font-size:0.8rem; margin-top:0.1rem;">
+            tâche{{ 's' if month_completed != 1 }} terminée{{ 's' if month_completed != 1 }}
+          </div>
+        </div>
+
+        <div class="card-soft" style="min-width:170px; padding:0.9rem 1rem;">
+          <div class="muted" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em;">
+            Semaine — Général
+          </div>
+          <div style="font-size:1.4rem; font-weight:600; margin-top:0.15rem;">
+            {{ week_general }}
+          </div>
+          <div class="muted" style="font-size:0.8rem; margin-top:0.1rem;">
+            tâche{{ 's' if week_general != 1 }} hors contenu
+          </div>
+        </div>
+
+        <div class="card-soft" style="min-width:170px; padding:0.9rem 1rem;">
+          <div class="muted" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em;">
+            Semaine — Contenu
+          </div>
+          <div style="font-size:1.4rem; font-weight:600; margin-top:0.15rem;">
+            {{ week_content }}
+          </div>
+          <div class="muted" style="font-size:0.8rem; margin-top:0.1rem;">
+            contenu{{ 's' if week_content != 1 }} publié{{ 's' if week_content != 1 }} / terminé{{ 's' if week_content != 1 }}
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:right; font-size:0.8rem; color:var(--text-muted); max-width:260px;">
+        Aujourd’hui : {{ today.strftime("%d.%m.%Y") }}<br>
+        Utilise ces stats pour ajuster ton rythme et ton planning de contenu.
+      </div>
+    </div>
+  </div>
+
+  <!-- INSIGHT ENGINE -->
+  <div class="card-soft" style="margin-bottom:1.5rem;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; flex-wrap:wrap;">
+      <div>
+        <h2 style="font-size:1.05rem; margin:0 0 0.4rem 0;">
+          Insights personnalisés
+        </h2>
+        <p class="muted" style="font-size:0.8rem; margin:0;">
+          Analyse basée sur tes tâches terminées et ton historique des 12 derniers mois.
+        </p>
+      </div>
+      <div class="pill" style="
+            background:rgba(59,130,246,0.12);
+            border-color:rgba(59,130,246,0.7);
+            color:#bfdbfe;
+            font-size:0.75rem;">
+        IA TaskFlow — Focus productivité
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:0.75rem; margin-top:1rem;">
+
+      <!-- Meilleurs jours -->
+      <div class="card-soft" style="padding:0.8rem 0.9rem;">
+        <div class="muted" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em;">
+          Jour le plus productif
+        </div>
+        <p style="font-size:0.9rem; margin:0.35rem 0 0.2rem 0;">
+          {{ productivity_message }}
+        </p>
+      </div>
+
+      <!-- Heure la plus active -->
+      <div class="card-soft" style="padding:0.8rem 0.9rem;">
+        <div class="muted" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em;">
+          Meilleur créneau horaire
+        </div>
+        <p style="font-size:0.9rem; margin:0.35rem 0 0.2rem 0;">
+          {{ timing_message }}
+        </p>
+      </div>
+
+      <!-- Progression mensuelle -->
+      <div class="card-soft" style="padding:0.8rem 0.9rem;">
+        <div class="muted" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em;">
+          Progression mensuelle
+        </div>
+        <p style="font-size:0.9rem; margin:0.35rem 0 0.35rem 0;">
+          {{ trend_message }}
+        </p>
+        <div class="muted" style="font-size:0.75rem;">
+          Ce mois-ci : <strong>{{ this_month_done }}</strong> tâche(s) terminée(s) ·
+          Mois dernier : <strong>{{ prev_month_done }}</strong>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- HEATMAP ACTIVITÉ (STYLE GITHUB) -->
+  <div class="card-soft">
+    <h2 style="font-size:1.05rem; margin-top:0; margin-bottom:0.4rem;">Activité sur 12 mois</h2>
+    <p class="muted" style="margin-bottom:0.8rem; font-size:0.8rem;">
+      Chaque carré représente un jour. Plus la couleur est foncée, plus tu as complété de tâches ce jour-là.
+    </p>
+
+    <div style="overflow-x:auto; padding-bottom:0.4rem;">
+      {% if heatmap %}
+        {% set max_count = (heatmap | map(attribute='count') | max) if heatmap else 1 %}
+        {% if max_count < 1 %}
+          {% set max_count = 1 %}
+        {% endif %}
+
+        <div style="display:flex; gap:4px;">
+          {# On regroupe par colonne de 7 jours (lundi → dimanche) #}
+          {% for col in heatmap|batch(7, fill_with=None) %}
+            <div style="display:flex; flex-direction:column; gap:4px;">
+              {% for cell in col %}
+                {% if cell %}
+                  {% set intensity = cell.count / max_count %}
+                  {% if intensity == 0 %}
+                    {% set color = '#111827' %}
+                  {% elif intensity <= 0.25 %}
+                    {% set color = '#1f2937' %}
+                  {% elif intensity <= 0.50 %}
+                    {% set color = '#3b82f6' %}
+                  {% elif intensity <= 0.75 %}
+                    {% set color = '#2563eb' %}
+                  {% else %}
+                    {% set color = '#1d4ed8' %}
+                  {% endif %}
+
+                  <div title="{{ cell.date.strftime('%d.%m.%Y') }} : {{ cell.count }} tâche(s) terminée(s)"
+                       style="
+                         width:14px;
+                         height:14px;
+                         border-radius:3px;
+                         background-color:{{ color }};
+                         border:1px solid rgba(15,23,42,0.9);
+                       ">
+                  </div>
+                {% else %}
+                  <div style="width:14px; height:14px;"></div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="muted">Pas encore d’historique suffisant pour afficher la heatmap.</p>
+      {% endif %}
+    </div>
+
+    <!-- Légende -->
+    <div style="display:flex; align-items:center; gap:0.4rem; margin-top:0.8rem; font-size:0.75rem; color:var(--text-muted);">
+      Moins
+      <div style="display:flex; gap:3px; align-items:center;">
+        <span style="width:14px; height:14px; border-radius:3px; background:#111827; border:1px solid rgba(15,23,42,0.9);"></span>
+        <span style="width:14px; height:14px; border-radius:3px; background:#1f2937; border:1px solid rgba(15,23,42,0.9);"></span>
+        <span style="width:14px; height:14px; border-radius:3px; background:#3b82f6; border:1px solid rgba(15,23,42,0.9);"></span>
+        <span style="width:14px; height:14px; border-radius:3px; background:#2563eb; border:1px solid rgba(15,23,42,0.9);"></span>
+        <span style="width:14px; height:14px; border-radius:3px; background:#1d4ed8; border:1px solid rgba(15,23,42,0.9);"></span>
+      </div>
+      Plus
+    </div>
+  </div>
+{% endblock %}

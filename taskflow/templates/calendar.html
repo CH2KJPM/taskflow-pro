@@ -1,0 +1,385 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; margin-bottom:1.2rem;">
+    <div>
+      <h1 class="page-title">Calendrier des tâches</h1>
+      <p class="page-subtitle">
+        Visualise tes tâches par date – projets classiques et contenus créateurs.
+      </p>
+      <br>
+    </div>
+
+    <div class="page-actions">
+      <div style="display:flex; gap:0.4rem; flex-wrap:wrap; justify-content:flex-end;">
+        <a href="{{ url_for('main.dashboard') }}">
+          <button class="btn btn-secondary" type="button">Dashboard</button>
+        </a>
+        <a href="{{ url_for('main.today') }}">
+          <button class="btn btn-secondary" type="button">Aujourd’hui</button>
+        </a>
+      </div>
+
+      <div style="display:flex; gap:0.4rem;">
+        <a href="{{ url_for('main.calendar_view', view='month',
+                            project_id=current_filters.project_id,
+                            priority=current_filters.priority,
+                            status=current_filters.status,
+                            task_type=current_filters.task_type,
+                            platform=current_filters.platform) }}">
+          <button class="btn {% if view == 'month' %}btn-primary{% else %}btn-secondary{% endif %}" type="button">
+            Vue mois
+          </button>
+        </a>
+        <a href="{{ url_for('main.calendar_view', view='week',
+                            project_id=current_filters.project_id,
+                            priority=current_filters.priority,
+                            status=current_filters.status,
+                            task_type=current_filters.task_type,
+                            platform=current_filters.platform) }}">
+          <button class="btn {% if view == 'week' %}btn-primary{% else %}btn-secondary{% endif %}" type="button">
+            Vue semaine
+          </button>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="card-soft" style="margin-bottom:1.5rem;">
+    <form method="get"
+          action="{{ url_for('main.calendar_view') }}"
+          style="display:flex; gap:0.75rem; flex-wrap:wrap; align-items:flex-end;">
+      <input type="hidden" name="view" value="{{ view }}">
+
+      <!-- Projet -->
+      <div class="field" style="min-width:180px;">
+        <label for="project_id">Projet</label>
+        <select id="project_id" name="project_id" class="select">
+          <option value="">Tous les projets</option>
+          {% for p in projects %}
+            <option value="{{ p.id }}"
+              {% if current_filters.project_id == p.id %}selected{% endif %}>
+              {{ p.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Priorité -->
+      <div class="field" style="min-width:150px;">
+        <label for="priority">Priorité</label>
+        <select id="priority" name="priority" class="select">
+          <option value="" {% if not current_filters.priority %}selected{% endif %}>Toutes</option>
+          <option value="low" {% if current_filters.priority == 'low' %}selected{% endif %}>Basse</option>
+          <option value="medium" {% if current_filters.priority == 'medium' %}selected{% endif %}>Moyenne</option>
+          <option value="high" {% if current_filters.priority == 'high' %}selected{% endif %}>Haute</option>
+        </select>
+      </div>
+
+      <!-- Statut général -->
+      <div class="field" style="min-width:150px;">
+        <label for="status">Statut général</label>
+        <select id="status" name="status" class="select">
+          <option value="" {% if not current_filters.status %}selected{% endif %}>Tous</option>
+          <option value="todo" {% if current_filters.status == 'todo' %}selected{% endif %}>À faire</option>
+          <option value="in_progress" {% if current_filters.status == 'in_progress' %}selected{% endif %}>En cours</option>
+          <option value="done" {% if current_filters.status == 'done' %}selected{% endif %}>Terminé</option>
+        </select>
+      </div>
+
+      <!-- Type de tâche -->
+      <div class="field" style="min-width:150px;">
+        <label for="task_type">Type</label>
+        <select id="task_type" name="task_type" class="select">
+          <option value="" {% if not current_filters.task_type %}selected{% endif %}>Tous</option>
+          <option value="general" {% if current_filters.task_type == 'general' %}selected{% endif %}>Général</option>
+          <option value="content" {% if current_filters.task_type == 'content' %}selected{% endif %}>Contenu</option>
+        </select>
+      </div>
+
+      <!-- Plateforme (contenu) -->
+      <div class="field" style="min-width:150px;">
+        <label for="platform">Plateforme (contenu)</label>
+        <select id="platform" name="platform" class="select">
+          <option value="" {% if not current_filters.platform %}selected{% endif %}>Toutes</option>
+          <option value="tiktok" {% if current_filters.platform == 'tiktok' %}selected{% endif %}>TikTok</option>
+          <option value="instagram" {% if current_filters.platform == 'instagram' %}selected{% endif %}>Instagram</option>
+          <option value="youtube" {% if current_filters.platform == 'youtube' %}selected{% endif %}>YouTube</option>
+          <option value="other" {% if current_filters.platform == 'other' %}selected{% endif %}>Autre / multi</option>
+        </select>
+      </div>
+
+      <div>
+        <button type="submit" class="btn btn-primary">Filtrer</button>
+      </div>
+    </form>
+  </div>
+
+  {% if view == 'month' %}
+    <!-- Vue mensuelle -->
+    <div class="card-soft">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem;">
+        <div class="page-subtitle">
+          {{ ("%02d" % month) }}/{{ year }}
+        </div>
+        <div style="display:flex; gap:0.4rem;">
+          <a href="{{ url_for('main.calendar_view', view='month', year=prev_month_year, month=prev_month,
+                              project_id=current_filters.project_id,
+                              priority=current_filters.priority,
+                              status=current_filters.status,
+                              task_type=current_filters.task_type,
+                              platform=current_filters.platform) }}">
+            <button class="btn btn-secondary" type="button">←</button>
+          </a>
+          <a href="{{ url_for('main.calendar_view', view='month', year=next_month_year, month=next_month,
+                              project_id=current_filters.project_id,
+                              priority=current_filters.priority,
+                              status=current_filters.status,
+                              task_type=current_filters.task_type,
+                              platform=current_filters.platform) }}">
+            <button class="btn btn-secondary" type="button">→</button>
+          </a>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap:0.35rem; font-size:0.8rem;">
+        {% set day_names = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'] %}
+        {% for name in day_names %}
+          <div class="muted" style="text-transform:uppercase; letter-spacing:0.08em; font-size:0.7rem;">
+            {{ name }}
+          </div>
+        {% endfor %}
+
+        {% for week in weeks %}
+          {% for cell in week %}
+            <div style="
+              min-height:90px;
+              padding:0.4rem;
+              border-radius:var(--radius-md);
+              border:1px solid rgba(31,41,55,0.9);
+              background: rgba(15,23,42,0.95);
+              opacity: {{ 1 if cell.is_current_month else 0.4 }};
+            ">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.2rem;">
+                <span style="font-size:0.8rem; font-weight:500;">
+                  {{ cell.date.day }}
+                </span>
+                {% if cell.tasks|length > 0 %}
+                  <span style="font-size:0.7rem; color:var(--text-muted);">
+                    {{ cell.tasks|length }} tâche{{ 's' if cell.tasks|length > 1 }}
+                  </span>
+                {% endif %}
+              </div>
+
+              {% for t in cell.tasks[:3] %}
+                <!-- ✅ CLIC = Drawer -->
+                <div class="js-task-open"
+                     data-task-id="{{ t.id }}"
+                     style="cursor:pointer; font-size:0.7rem; margin-bottom:0.15rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                  {% if t.task_type == "content" %}
+                    <span class="pill" style="font-size:0.6rem; padding:0.05rem 0.35rem; margin-right:0.2rem;
+                      background:rgba(236,72,153,0.12); border-color:rgba(236,72,153,0.6); color:#f9a8d4;">
+                      C
+                    </span>
+                  {% else %}
+                    <span class="pill" style="font-size:0.6rem; padding:0.05rem 0.35rem; margin-right:0.2rem;
+                      background:rgba(148,163,184,0.12); border-color:rgba(148,163,184,0.6); color:#e5e7eb;">
+                      G
+                    </span>
+                  {% endif %}
+
+                  {% if t.task_type == "content" and t.platform %}
+                    {% if t.platform == "tiktok" %}
+                      <span style="font-size:0.65rem; margin-right:0.15rem; color:#fecaca;">TT ·</span>
+                    {% elif t.platform == "instagram" %}
+                      <span style="font-size:0.65rem; margin-right:0.15rem; color:#f9a8d4;">IG ·</span>
+                    {% elif t.platform == "youtube" %}
+                      <span style="font-size:0.65rem; margin-right:0.15rem; color:#fecaca;">YT ·</span>
+                    {% else %}
+                      <span style="font-size:0.65rem; margin-right:0.15rem; color:#bfdbfe;">Multi ·</span>
+                    {% endif %}
+                  {% endif %}
+
+                  {{ t.title }}
+                </div>
+              {% endfor %}
+
+              {% if cell.tasks|length > 3 %}
+                <div class="muted" style="font-size:0.7rem;">+ {{ cell.tasks|length - 3 }} autres…</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        {% endfor %}
+      </div>
+    </div>
+
+  {% elif view == 'week' %}
+    <!-- Vue hebdomadaire -->
+    <div class="card-soft">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem;">
+        <div class="page-subtitle">
+          Semaine du {{ week_start.strftime("%d.%m.%Y") }}
+        </div>
+
+        <div style="display:flex; gap:0.4rem;">
+          <a href="{{ url_for('main.calendar_view', view='week',
+                              week_start=prev_week_start.strftime('%Y-%m-%d'),
+                              project_id=current_filters.project_id,
+                              priority=current_filters.priority,
+                              status=current_filters.status,
+                              task_type=current_filters.task_type,
+                              platform=current_filters.platform) }}">
+            <button class="btn btn-secondary" type="button">←</button>
+          </a>
+
+          <a href="{{ url_for('main.calendar_view', view='week',
+                              week_start=next_week_start.strftime('%Y-%m-%d'),
+                              project_id=current_filters.project_id,
+                              priority=current_filters.priority,
+                              status=current_filters.status,
+                              task_type=current_filters.task_type,
+                              platform=current_filters.platform) }}">
+            <button class="btn btn-secondary" type="button">→</button>
+          </a>
+        </div>
+      </div>
+
+      <!-- ✅ Week grid (drop zones) -->
+      <div style="display:grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap:0.5rem; font-size:0.8rem;">
+        {% for day in week_days %}
+          <div data-drop-date="{{ day.date.strftime('%Y-%m-%d') }}"
+               style="
+                 padding:0.5rem;
+                 border-radius:var(--radius-md);
+                 border:1px solid rgba(31,41,55,0.9);
+                 background: rgba(15,23,42,0.95);
+                 min-height:110px;
+               ">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem;">
+              <div>
+                <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted);">
+                  {{ day.date.strftime('%a') }}
+                </div>
+                <div style="font-size:0.95rem; font-weight:500;">
+                  {{ day.date.day }}
+                </div>
+              </div>
+              {% if day.tasks|length > 0 %}
+                <span style="font-size:0.7rem; color:var(--text-muted);">
+                  {{ day.tasks|length }} tâche{{ 's' if day.tasks|length > 1 }}
+                </span>
+              {% endif %}
+            </div>
+
+            {% if day.tasks %}
+              {% for t in day.tasks %}
+                <!-- ✅ draggable + clickable -->
+                <div class="task-card js-task-open"
+                     data-task-id="{{ t.id }}"
+                     draggable="true"
+                     style="cursor:pointer; margin-bottom:0.35rem; padding:0.35rem 0.45rem;">
+                  <div class="task-title" style="font-size:0.8rem; margin-bottom:0.15rem;">
+                    {{ t.title }}
+                  </div>
+                  <div class="task-meta" style="margin-top:0;">
+                    <div style="display:flex; gap:0.25rem; flex-wrap:wrap;">
+                      {% if t.task_type == "content" %}
+                        <span class="pill" style="background:rgba(236,72,153,0.12); border-color:rgba(236,72,153,0.6); color:#f9a8d4;">
+                          Contenu
+                        </span>
+                      {% else %}
+                        <span class="pill" style="background:rgba(148,163,184,0.12); border-color:rgba(148,163,184,0.6); color:#e5e7eb;">
+                          Général
+                        </span>
+                      {% endif %}
+
+                      {% if t.task_type == "content" and t.platform %}
+                        {% if t.platform == "tiktok" %}
+                          <span class="pill" style="background:rgba(248,113,113,0.12); border-color:rgba(248,113,113,0.7); color:#fecaca;">TikTok</span>
+                        {% elif t.platform == "instagram" %}
+                          <span class="pill" style="background:rgba(236,72,153,0.12); border-color:rgba(236,72,153,0.7); color:#f9a8d4;">Instagram</span>
+                        {% elif t.platform == "youtube" %}
+                          <span class="pill" style="background:rgba(248,113,113,0.12); border-color:rgba(239,68,68,0.8); color:#fecaca;">YouTube</span>
+                        {% else %}
+                          <span class="pill" style="background:rgba(59,130,246,0.12); border-color:rgba(59,130,246,0.7); color:#bfdbfe;">Multi</span>
+                        {% endif %}
+                      {% endif %}
+
+                      {% if t.priority == 'low' %}
+                        <span class="pill pill-low">Basse</span>
+                      {% elif t.priority == 'high' %}
+                        <span class="pill pill-high">Haute</span>
+                      {% else %}
+                        <span class="pill pill-medium">Moyenne</span>
+                      {% endif %}
+                    </div>
+                    <div class="muted" style="font-size:0.7rem;">
+                      {{ t.project.name }}
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            {% else %}
+              <p class="muted" style="font-size:0.75rem;">Aucune tâche ce jour.</p>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- ✅ JS Drag & Drop (uniquement week) -->
+    <script>
+    (function(){
+      let draggedTaskId = null;
+
+      document.addEventListener("dragstart", (e)=>{
+        const card = e.target.closest(".task-card[draggable='true']");
+        if(!card) return;
+        draggedTaskId = card.getAttribute("data-task-id");
+        card.classList.add("dragging");
+      });
+
+      document.addEventListener("dragend", (e)=>{
+        const card = e.target.closest(".task-card[draggable='true']");
+        if(card) card.classList.remove("dragging");
+        draggedTaskId = null;
+      });
+
+      document.addEventListener("dragover", (e)=>{
+        const col = e.target.closest("[data-drop-date]");
+        if(!col) return;
+        e.preventDefault();
+        col.classList.add("drag-over");
+      });
+
+      document.addEventListener("dragleave", (e)=>{
+        const col = e.target.closest("[data-drop-date]");
+        if(!col) return;
+        col.classList.remove("drag-over");
+      });
+
+      document.addEventListener("drop", async (e)=>{
+        const col = e.target.closest("[data-drop-date]");
+        if(!col || !draggedTaskId) return;
+        e.preventDefault();
+        col.classList.remove("drag-over");
+
+        const newDate = col.getAttribute("data-drop-date");
+
+        const res = await fetch(`/task/${draggedTaskId}/move_date`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ due_date: newDate })
+        });
+
+        if(res.ok){
+          window.location.reload();
+        }else{
+          alert("Impossible de déplacer la tâche.");
+        }
+      });
+    })();
+    </script>
+  {% endif %}
+{% endblock %}

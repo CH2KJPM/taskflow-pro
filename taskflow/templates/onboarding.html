@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="
+  min-height: calc(100vh - 80px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+">
+  <div class="card-soft" style="max-width: 520px; width: 100%; text-align:center;">
+
+    <h1 class="page-title" style="font-size: 1.8rem; margin-bottom: 0.3rem;">
+      Bienvenue dans TaskFlow 🚀
+    </h1>
+
+    <p class="page-subtitle" style="margin-bottom: 1.5rem;">
+      Choisis ton mode d’utilisation pour personnaliser ton espace.
+    </p>
+
+    <form method="post" action="{{ url_for('main.onboarding') }}">
+
+      <div style="display:flex; flex-direction:column; gap:1rem; margin-bottom:1.5rem;">
+
+        <!-- MODE STANDARD -->
+        <label style="
+          border: 1px solid var(--border-soft);
+          background: rgba(255,255,255,0.02);
+          backdrop-filter: blur(6px);
+          border-radius: 12px;
+          padding: 1rem;
+          cursor: pointer;
+          text-align:left;
+        ">
+          <input type="radio" name="user_type" value="simple">
+          <strong style="font-size:1.1rem;">Mode Normal</strong>
+          <p class="muted" style="font-size:0.85rem; margin-top:0.2rem;">
+            Gestion classique de projets, tâches, priorités et objectifs.
+          </p>
+        </label>
+
+        <!-- MODE CRÉATEUR -->
+        <label style="
+          border: 1px solid var(--border-soft);
+          background: rgba(255,255,255,0.02);
+          backdrop-filter: blur(6px);
+          border-radius: 12px;
+          padding: 1rem;
+          cursor: pointer;
+          text-align:left;
+        ">
+          <input type="radio" name="user_type" value="creator" required>
+          <strong style="font-size:1.1rem;">Mode Créateur 🎬</strong>
+          <p class="muted" style="font-size:0.85rem; margin-top:0.2rem;">
+            Planification de contenus (TikTok, YouTube, Insta), backlog idées,
+            calendrier éditorial, étapes de création, etc.
+          </p>
+        </label>
+
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width:100%;">
+        Continuer →
+      </button>
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}

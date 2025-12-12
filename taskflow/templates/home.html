@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="hero-layout">
+    <div>
+      <div class="hero-badge">
+        <span>⚡</span>
+        <span>Organise tes journées comme une équipe pro</span>
+      </div>
+      <h1 class="hero-title">Centralise tes tâches.<br>Garde le contrôle.</h1>
+      <p class="page-subtitle">
+        TaskFlow Pro est ton tableau de bord personnel : projets, tâches et priorités
+        réunis dans une interface claire, rapide et agréable.
+      </p>
+
+      <div class="hero-cta">
+        <a href="{{ url_for('auth.register') }}">
+          <button class="btn btn-primary">
+            Commencer gratuitement
+          </button>
+        </a>
+        <a href="{{ url_for('auth.login') }}">
+          <button class="btn btn-secondary">
+            J’ai déjà un compte
+          </button>
+        </a>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <p class="page-subtitle" style="margin-bottom:0.6rem;">Aperçu rapide</p>
+        <h2 style="margin:0 0 0.9rem; font-size:1.15rem;">Un Kanban simple, pensé pour toi</h2>
+        <p class="muted" style="margin-bottom:1rem;">
+          Crée des projets, ajoute des tâches, change leur statut en un clic,
+          garde une vue claire sur ce qui est à faire, en cours ou terminé.
+        </p>
+
+        <div class="kanban-columns">
+          <div class="kanban-column">
+            <h3>À faire</h3>
+            <div class="task-card">
+              <div class="task-title">Préparer ma journée</div>
+              <div class="task-meta">
+                <span class="pill pill-medium">Medium</span>
+                <span class="task-date">Aujourd’hui</span>
+              </div>
+            </div>
+          </div>
+          <div class="kanban-column">
+            <h3>En cours</h3>
+            <div class="task-card">
+              <div class="task-title">Répondre aux e-mails</div>
+              <div class="task-meta">
+                <span class="pill pill-low">Low</span>
+                <span class="task-date">Demain</span>
+              </div>
+            </div>
+          </div>
+          <div class="kanban-column">
+            <h3>Terminé</h3>
+            <div class="task-card">
+              <div class="task-title">Planifier la semaine</div>
+              <div class="task-meta">
+                <span class="pill pill-high">High</span>
+                <span class="task-date">Hier</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
