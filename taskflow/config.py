@@ -1,9 +1,15 @@
+# taskflow/config.py
 import os
 
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-
 class Config:
-    SECRET_KEY = os.environ.get("SECRET_KEY") or "dev-secret-key-change-me"
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL") or \
-        "sqlite:///" + os.path.join(BASE_DIR, "..", "taskflow.db")
+    SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-change-me")
+
+    # Render/Neon fournit DATABASE_URL
+    _db_url = os.environ.get("DATABASE_URL", "").strip()
+
+    # Neon/Render peuvent donner "postgres://", SQLAlchemy veut "postgresql://"
+    if _db_url.startswith("postgres://"):
+        _db_url = _db_url.replace("postgres://", "postgresql://", 1)
+
+    SQLALCHEMY_DATABASE_URI = _db_url if _db_url else "sqlite:///taskflow.db"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
