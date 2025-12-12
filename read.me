@@ -1,4 +1,143 @@
-allez sur le chemin : 
-faire : source venv/bin/activate
-Lancer avec : python3 app.py
+# TaskFlow Pro — Notes personnelles
 
+⚠️ Ce fichier est un mémo PERSONNEL.
+Il n’est pas destiné à être public.
+Il sert uniquement à me rappeler :
+- comment fonctionne le projet
+- comment déployer
+- comment utiliser Git
+
+## 🎯 Objectif du projet
+
+- Développer TaskFlow en local (Mac)
+- Sauvegarder le code sur GitHub (backup)
+- Déployer gratuitement sur Render
+- Utiliser une base Postgres gratuite (Neon)
+
+## 📁 Structure du projet
+
+app.py
+→ Point d’entrée pour Gunicorn (production)
+
+taskflow/
+→ Application Flask
+(routes, models, auth, config, templates)
+
+requirements.txt
+→ Dépendances Python
+
+taskflow.db
+→ Base SQLite locale (DEV uniquement)
+
+venv/
+→ Environnement Python local (NE JAMAIS PUSH)
+
+## 🧑‍💻 Développement local
+
+Activer l’environnement virtuel :
+source venv/bin/activate
+
+Lancer l’application :
+python3 app.py
+
+URL locale :
+http://127.0.0.1:5000
+
+## 🔄 Git — Mémo simple
+
+À FAIRE À CHAQUE MODIFICATION :
+
+1) Vérifier l’état
+git status
+
+2) Ajouter les fichiers
+git add .
+
+3) Sauvegarder (commit)
+git commit -m "Description claire de la modification"
+
+4) Envoyer sur GitHub
+git push
+
+Exemples de messages de commit :
+
+"Fix DATABASE_URL config for Render"
+"Add task drawer UI"
+"Fix Postgres password_hash type"
+
+## ☁️ Déploiement Render (gratuit)
+
+Type :
+Web Service
+
+Start Command :
+gunicorn app:app --bind 0.0.0.0:$PORT
+
+Variables d’environnement sur Render :
+
+SECRET_KEY = clé secrète
+DATABASE_URL = fournie par Neon
+
+⚠️ Ne jamais mettre ces valeurs en dur dans le code
+
+## 🗄️ Base de données (Neon)
+
+Postgres gratuit connecté à Render
+
+Commande utile :
+\d "user"
+
+Erreur psycopg2 manquant :
+
+Solution → requirements.txt :
+psycopg2-binary==2.9.9
+gunicorn==23.0.0
+
+## ❌ Erreur password_hash trop long
+
+Cause :
+password_hash Flask est très long
+VARCHAR(128) insuffisant
+
+Solution SQL :
+ALTER TABLE "user"
+ALTER COLUMN password_hash TYPE text;
+
+## ⚙️ Configuration Flask (config.py)
+
+UNE SEULE class Config :
+
+import os
+
+class Config:
+    SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-change-me")
+
+    db_url = (os.environ.get("DATABASE_URL") or "").strip()
+
+    if db_url.startswith("postgres://"):
+        db_url = db_url.replace("postgres://", "postgresql://", 1)
+
+    SQLALCHEMY_DATABASE_URI = db_url if db_url else "sqlite:///taskflow.db"
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    ## 🧠 Bonnes pratiques
+
+NE JAMAIS COMMIT :
+- venv/
+- taskflow.db
+- SECRET_KEY
+- DATABASE_URL
+
+TOUJOURS :
+- commit souvent
+- push avant grosses modifs
+- lire les logs Render en cas d’erreur
+
+## 🏁 État actuel
+
+✅ Application fonctionnelle
+✅ Déployée sur Render
+✅ Base Postgres Neon OK
+✅ Auth, dashboard, calendrier, analytics OK
+
+Projet prêt à évoluer 🚀
